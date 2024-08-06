@@ -2,6 +2,7 @@ from settings import *
 from level import Level
 from pytmx.util_pygame import load_pygame
 
+#lolololololololololol
 class Game:
     def __init__(self):
         pygame.init()
