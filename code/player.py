@@ -30,7 +30,8 @@ class Player(pygame.sprite.Sprite):
 
         #timer
         self.timers = {
-            'wall jump': Timer(200)
+            'wall jump': Timer(400),
+            'wall slide': Timer(250)
         }
 
     def input(self):
@@ -39,14 +40,15 @@ class Player(pygame.sprite.Sprite):
         key_down = pygame.key.get_just_pressed()
 
         #horizontal
-        if keys[pygame.K_a]:
-            input_vector.x += -1 #move left
-        if keys[pygame.K_d]:
-            input_vector.x += 1 #move right
-        #if opposite keys (a , d) are simultaniously pressed, vector movement = 0
-        if abs(input_vector.x) > 0:
-            self.direction.x = input_vector.normalize().x if input_vector else input_vector.x #making vector always equal 1, or if 0, just the input
-        #print(self.direction)
+        if not self.timers['wall jump'].active:
+            if keys[pygame.K_a]:
+                input_vector.x += -1 #move left
+            if keys[pygame.K_d]:
+                input_vector.x += 1 #move right
+            #if opposite keys (a , d) are simultaniously pressed, vector movement = 0
+            if abs(input_vector.x) > 0:
+                self.direction.x = input_vector.normalize().x if input_vector else input_vector.x #making vector always equal 1, or if 0, just the input
+            #print(self.direction)
 
         #dash activation
         if key_down[pygame.K_LSHIFT] and self.dash_num >= 1: #dashing in x plane is wrong?
@@ -60,9 +62,11 @@ class Player(pygame.sprite.Sprite):
         #jumping
         if keys[pygame.K_SPACE]:
             self.jump = True
-            self.timers['wall jump'].activate()
             if self.on_surface['floor']:
-                self.direction.y = -self.jump_height         
+                self.direction.y = -self.jump_height
+                self.timers['wall slide'].activate()
+                
+       
         if key_down[pygame.K_SPACE] and self.bonus_jumps > 0 and not self.on_surface['floor']:
             self.direction.y = -self.jump_height
             self.bonus_jumps -= 1
@@ -86,25 +90,26 @@ class Player(pygame.sprite.Sprite):
             self.dash = False
             self.dash_num -= 1
         self.rect.x += self.direction.x * self.speed * dt ## make it self.drag? do one for both x and
+        
         self.collision('horizontal')
 
         #vertical
-        if not self.on_surface['floor'] and any((self.on_surface['left'], self.on_surface['right'])):
+        if not self.on_surface['floor'] and any((self.on_surface['left'], self.on_surface['right'])) and not self.timers['wall jump'].active:
             self.direction.y = 0
-            self.rect.y += self.gravity * 3 * dt
+            self.rect.y += self.gravity * 5 * dt
         else:
             self.direction.y += self.gravity / 2 * dt  #dividing by two and then putting it twice to make sure it is fps independant
             self.rect.y += self.direction.y
             self.direction.y += self.gravity / 2 * dt
-        if self.jump: #wall jumps
-            if self.on_surface['floor']:
-                self.direction.y = -self.jump_height
-            if any((self.on_surface['left'], self.on_surface['right'])):
-                if self.bonus_jumps < 1:
-                    self.bonus_jumps += 1
+            
+        if self.jump: #wall jumps -TODO!- jumping while holding direction of wall, only slide if y direction is down(pos) only slide if holding into wall - redo whole wall slide                
+            if any((self.on_surface['left'], self.on_surface['right'])) and not self.timers['wall slide'].active:
+                #if self.bonus_jumps < 1:
+                #    self.bonus_jumps += 1
                 self.direction.y = -self.jump_height
                 self.direction.x = 1 if self.on_surface['left'] else -1
             self.jump = False
+            
         self.collision('vert')
 
         #checking if player has collided with a cieling
