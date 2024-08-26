@@ -64,23 +64,13 @@ class Player(pygame.sprite.Sprite):
             self.jump = True
             if self.on_surface['floor']:
                 self.direction.y = -self.jump_height
-                self.timers['wall slide'].activate()
                 
-       
         if key_down[pygame.K_SPACE] and self.bonus_jumps > 0 and not self.on_surface['floor']:
             self.direction.y = -self.jump_height
             self.bonus_jumps -= 1
         if keys[pygame.K_SPACE] and self.dash == True:
             self.dash_num -= 1
             self.direction.y = -self.jump_height * self.dashy_multi
-
-    def add_drag(self, dt):
-        self.direction.x *= self.drag_coefficient ## make it self.drag? do one for both x and y to impliment into move? - update() only changes max, not acceleration??
-        #preventing speed being too slow, so drag stops when player is moving slow enough
-        #print(self.direction.x * self.drag_coefficient)
-        #print(self.direction.x)
-        if -0.01 < self.direction.x and self.direction.x < 0.01: self.direction.x = 0
-        if -0.01 < self.direction.y and self.direction.y < 0.01: self.direction.y = 0
 
     def move(self, dt):
         self.add_drag(dt)
@@ -94,20 +84,25 @@ class Player(pygame.sprite.Sprite):
         self.collision('horizontal')
 
         #vertical
-        if not self.on_surface['floor'] and any((self.on_surface['left'], self.on_surface['right'])) and not self.timers['wall jump'].active:
-            self.direction.y = 0
-            self.rect.y += self.gravity * 5 * dt
+        if not self.on_surface['floor'] and any((self.on_surface['left'], self.on_surface['right'])) and not self.timers['wall slide'].active :#and not self.old_rect.y <= self.rect.y
+            self.rect.y += self.gravity * 5 * dt 
+            print('jump')
+             #self.direction.y = 0
+                
         else:
             self.direction.y += self.gravity / 2 * dt  #dividing by two and then putting it twice to make sure it is fps independant
             self.rect.y += self.direction.y
             self.direction.y += self.gravity / 2 * dt
             
-        if self.jump: #wall jumps -TODO!- jumping while holding direction of wall, only slide if y direction is down(pos) only slide if holding into wall - redo whole wall slide                
-            if any((self.on_surface['left'], self.on_surface['right'])) and not self.timers['wall slide'].active:
-                #if self.bonus_jumps < 1:
-                #    self.bonus_jumps += 1
+        if self.jump:
+                 #wall jumps -TODO!- jumping while holding direction of wall, only slide if y direction is down(pos) only slide if holding into wall - redo whole wall slide                
+            if any((self.on_surface['left'], self.on_surface['right'])) and not self.timers['wall slide'].active and not self.old_rect.y <= self.rect.y:
+                self.timers['wall jump'].activate()
                 self.direction.y = -self.jump_height
-                self.direction.x = 1 if self.on_surface['left'] else -1
+                self.direction.x = 1 if self.on_surface['left'] else -1 
+                if self.bonus_jumps < 1:
+                    self.bonus_jumps += 1
+                
             self.jump = False
             
         self.collision('vert')
@@ -115,6 +110,14 @@ class Player(pygame.sprite.Sprite):
         #checking if player has collided with a cieling
         if self.on_surface['roof']:
             self.direction.y = 0.6
+            
+    def add_drag(self, dt):
+        self.direction.x *= self.drag_coefficient ## make it self.drag? do one for both x and y to impliment into move? - update() only changes max, not acceleration??
+        #preventing speed being too slow, so drag stops when player is moving slow enough
+        #print(self.direction.x * self.drag_coefficient)
+        #print(self.direction.x)
+        if -0.01 < self.direction.x and self.direction.x < 0.01: self.direction.x = 0
+        if -0.01 < self.direction.y and self.direction.y < 0.01: self.direction.y = 0
 
     def check_contacts(self):
         floor_rect = pygame.Rect(self.rect.bottomleft,(self.rect.width, 1))
@@ -164,6 +167,7 @@ class Player(pygame.sprite.Sprite):
         self.old_rect = self.rect.copy()
         self.update_timers()
         self.input()
+        #update drag
         if self.on_surface['floor']:
             self.bonus_jumps = 1
             self.dash_num = 1
