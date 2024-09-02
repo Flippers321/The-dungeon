@@ -5,7 +5,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, pos, groups, collision_sprites):
         super().__init__(groups)
         self.image = pygame.Surface((16,16))
-        self.image.fill('blue')
+        #self.image.fill('blue')
 
         #rects
         self.rect = self.image.get_frect(topleft = pos)
@@ -20,7 +20,7 @@ class Player(pygame.sprite.Sprite):
         self.jump_height = 5
         self.bonus_jumps = 1
         self.dash = False
-        self.dashx_multi = 40
+        self.dashx_multi = 2
         self.dashy_multi = 2
         self.dash_num = 1
         self.input_vector = vector()
@@ -65,7 +65,7 @@ class Player(pygame.sprite.Sprite):
             self.direction.y = -self.jump_height
             self.bonus_jumps -= 1
             
-        if key_down[pygame.K_LSHIFT]:
+        if key_down[pygame.K_LSHIFT] and self.dash_num > 0:
             self.timers['dash'].activate()
 
 
@@ -73,18 +73,22 @@ class Player(pygame.sprite.Sprite):
         self.direction.x += self.input_vector.x * self.speed
         #print(self.input_vector)
         #horizontal
+        self.image.fill('blue')
+        if self.dash_num < 1:
+            self.image.fill('red')
         if self.timers['dash'].active:
             self.dash_num -= 1
-            self.rect.x += self.input_vector.x * self.speed * self.dashx_multi * dt
+            self.direction.x = self.direction.x * self.speed * self.dashx_multi * dt 
             self.direction.y = self.direction.y * self.speed * self.dashy_multi * dt
             
         #drag
         self.direction.x *= 0.80
-        if self.direction.x > 200 or self.direction.x < -200:
-            self.direction.x = 200 if self.direction.x > 200 else -200
-        if self.direction.x < 0.1 and self.direction.x > -0.1:
-            self.direction.x = 0
-
+        # if self.direction.x > 200 or self.direction.x < -200 and not self.timers['dash'].active:
+        #     self.direction.x = 200 if self.direction.x > 200 else -200
+        # if self.direction.x < 0.1 and self.direction.x > -0.1:
+        #     self.direction.x = 0
+        
+        print(self.dash_num)
         self.rect.x += self.direction.x * dt ## make it self.drag? do one for both x and
         self.collision('horizontal')  
         
@@ -94,11 +98,10 @@ class Player(pygame.sprite.Sprite):
                 self.direction.y = -self.jump_height
             elif self.on_surface['left']:
                 self.direction.y = -self.jump_height
-                self.direction.x = 1000
+                self.direction.x = 200
             elif self.on_surface['right']:
                 self.direction.y = -self.jump_height
-                self.direction.x = -1000
-                #TODO: fix wall jump sliding up wall if going back to same wall
+                self.direction.x = -200               
         if self.on_surface['roof']:
             self.direction.y = 0
 
@@ -109,6 +112,7 @@ class Player(pygame.sprite.Sprite):
 
         self.rect.y += self.direction.y
         self.collision('vert')
+        
         
 
     def check_contacts(self):
