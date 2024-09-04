@@ -70,9 +70,11 @@ class Player(pygame.sprite.Sprite):
 
 
     def move(self, dt):
-        self.direction.x += self.input_vector.x * self.speed
+        
         #print(self.input_vector)
         #horizontal
+        self.direction.x += self.input_vector.x * self.speed
+        
         self.image.fill('blue')
         if self.dash_num < 1:
             self.image.fill('red')
@@ -83,6 +85,7 @@ class Player(pygame.sprite.Sprite):
             
         #drag
         self.direction.x *= 0.80
+        ###do seperate drag for dashing???
         # if self.direction.x > 200 or self.direction.x < -200 and not self.timers['dash'].active:
         #     self.direction.x = 200 if self.direction.x > 200 else -200
         # if self.direction.x < 0.1 and self.direction.x > -0.1:

@@ -17,10 +17,12 @@ class Level:
     #getting pos of values stored in layer
     def setup(self, tmx_map):
         #tiles
-        for x,y,surf in (tmx_map.get_layer_by_name('cave').tiles()):
-            Sprite((x * TILE_SIZE, y * TILE_SIZE), surf, (self.all_sprites, self.collision_sprites))
-        for x,y,surf in (tmx_map.get_layer_by_name('platforms').tiles()):
-            Sprite((x * TILE_SIZE, y * TILE_SIZE), surf, (self.all_sprites, self.collision_sprites))
+        for layer in ['gem', 'spikes', 'platforms', 'cave', 'climbing chains', 'background obj']:
+            for x,y,surf in (tmx_map.get_layer_by_name(layer).tiles()):
+                groups = [self.all_sprites]
+                if layer == 'cave': groups.append(self.collision_sprites)
+                Sprite((x * TILE_SIZE, y * TILE_SIZE), surf, groups)
+
         
         #spawn objects
         for obj in tmx_map.get_layer_by_name('spawn'):
