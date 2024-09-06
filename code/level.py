@@ -27,7 +27,6 @@ class Level:
         #spawn objects
         for obj in tmx_map.get_layer_by_name('spawn'):
             if obj.name == 'start':
-                print('l')
                 Player((obj.x, obj.y), self.all_sprites, self.collision_sprites)
         
         #no bg displayed yet
