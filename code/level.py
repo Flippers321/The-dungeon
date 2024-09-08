@@ -21,6 +21,8 @@ class Level:
             for x,y,surf in (tmx_map.get_layer_by_name(layer).tiles()):
                 groups = [self.all_sprites]
                 if layer == 'cave': groups.append(self.collision_sprites)
+                if layer == 'platforms': groups.append(self.collision_sprites)
+                #z layers for chains?
                 Sprite((x * TILE_SIZE, y * TILE_SIZE), surf, groups)
 
         
