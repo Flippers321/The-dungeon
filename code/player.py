@@ -91,7 +91,7 @@ class Player(pygame.sprite.Sprite):
         # if self.direction.x < 0.1 and self.direction.x > -0.1:
         #     self.direction.x = 0
         
-        print(self.dash_num)
+        #print(self.dash_num)
         self.rect.x += self.direction.x * dt ## make it self.drag? do one for both x and
         self.collision('horizontal')  
         
