@@ -1,10 +1,12 @@
 from settings import *
 from timer import Timer
+from os.path import join 
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos, groups, collision_sprites):
         super().__init__(groups)
-        self.image = pygame.Surface((16,16))
+        self.image = pygame.image.load(join('assets', 'Miner', 'idle', '0.png'))   #pygame.Surface((16,16))
+        self.z = Z_LAYERS['default']
         #self.image.fill('blue')
 
         #rects
@@ -12,7 +14,7 @@ class Player(pygame.sprite.Sprite):
         self.old_rect = self.rect.copy()
 
         #movement
-        self.direction = vector()
+        self.direction = vector() 
         self.speed = 50
         self.drag_coefficient = 0.30
         self.gravity = 13
@@ -21,7 +23,7 @@ class Player(pygame.sprite.Sprite):
         self.bonus_jumps = 1
         self.dash = False
         self.dashx_multi = 2
-        self.dashy_multi = 2
+        self.dashy_multi = 1.4
         self.dash_num = 1
         self.input_vector = vector()
 
@@ -75,13 +77,13 @@ class Player(pygame.sprite.Sprite):
         #horizontal
         self.direction.x += self.input_vector.x * self.speed
         
-        self.image.fill('blue')
+        #self.image.fill('blue')
         if self.dash_num < 1:
-            self.image.fill('red')
-        if self.timers['dash'].active:
-            self.dash_num -= 1
-            self.direction.x = self.direction.x * self.speed * self.dashx_multi * dt 
-            self.direction.y = self.direction.y * self.speed * self.dashy_multi * dt
+            #self.image.fill('red')
+            if self.timers['dash'].active:
+                self.dash_num -= 1
+                self.direction.x = self.direction.x * self.speed * self.dashx_multi * dt 
+                self.direction.y = self.direction.y * self.speed * self.dashy_multi * dt
             
         #drag
         self.direction.x *= 0.80
@@ -142,19 +144,19 @@ class Player(pygame.sprite.Sprite):
             if sprite.rect.colliderect(self.rect):
                 if axis == 'horizontal':
                     # left
-                    if self.rect.left <= sprite.rect.right and self.old_rect.left >= sprite.old_rect.right:
+                    if self.rect.left <= sprite.rect.right and int(self.old_rect.left) >= int(sprite.old_rect.right):
                         self.rect.left = sprite.rect.right
                     # right
-                    if self.rect.right >= sprite.rect.left and self.old_rect.right <= sprite.old_rect.left:
+                    if self.rect.right >= sprite.rect.left and int(self.old_rect.right) <= int(sprite.old_rect.left):
                         self.rect.right = sprite.rect.left
 
                 else: #vertical
 
                     #top
-                    if self.rect.top <= sprite.rect.bottom and self.old_rect.top >= sprite.old_rect.bottom:
+                    if self.rect.top <= sprite.rect.bottom and int(self.old_rect.top) >= int(sprite.old_rect.bottom):
                         self.rect.top = sprite.rect.bottom
                     #bottom
-                    if self.rect.bottom >= sprite.rect.top and self.old_rect.bottom <= sprite.old_rect.top:
+                    if self.rect.bottom >= sprite.rect.top and int(self.old_rect.bottom) <= int(sprite.old_rect.top):
                         self.rect.bottom = sprite.rect.top
                         self.direction.y = 0
 

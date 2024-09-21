@@ -1,6 +1,7 @@
 from settings import *
 from sprites import Sprite
 from player import Player
+from groups import AllSprites
 
 ##level 2 moving platforms?
 
@@ -9,7 +10,7 @@ class Level:
         self.display_surface = pygame.display.get_surface()
         
         #groups
-        self.all_sprites = pygame.sprite.Group()
+        self.all_sprites = AllSprites()
         self.collision_sprites = pygame.sprite.Group()
         
         self.setup(tmx_map)
@@ -22,20 +23,20 @@ class Level:
                 groups = [self.all_sprites]
                 if layer == 'cave': groups.append(self.collision_sprites)
                 if layer == 'platforms': groups.append(self.collision_sprites)
-                #z layers for chains?
-                Sprite((x * TILE_SIZE, y * TILE_SIZE), surf, groups)
+                z = Z_LAYERS['climbing chains']
+                Sprite((x * TILE_SIZE, y * TILE_SIZE), surf, groups, z)
 
         
         #spawn objects
         for obj in tmx_map.get_layer_by_name('spawn'):
             if obj.name == 'start':
-                Player((obj.x, obj.y), self.all_sprites, self.collision_sprites)
+                self.player = Player((obj.x, obj.y), self.all_sprites, self.collision_sprites)
         
         #no bg displayed yet
         #moving objects?
             
             
     def run(self, dt):
-        self.display_surface.fill((50, 50, 50))
+        self.display_surface.fill((38, 28, 26))
         self.all_sprites.update(dt)
-        self.all_sprites.draw(self.display_surface)
+        self.all_sprites.draw(self.player.rect.center)
