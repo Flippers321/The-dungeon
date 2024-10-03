@@ -1,7 +1,7 @@
 from settings import *
 from sprites import Sprite
 from player import Player
-from groups import AllSprites
+from groups import CameraGroup
 
 ##level 2 moving platforms?
 
@@ -10,7 +10,7 @@ class Level:
         self.display_surface = pygame.display.get_surface()
         
         #groups
-        self.all_sprites = AllSprites()
+        self.all_sprites = CameraGroup()
         self.collision_sprites = pygame.sprite.Group()
         
         self.setup(tmx_map)
@@ -39,4 +39,4 @@ class Level:
     def run(self, dt):
         self.display_surface.fill((38, 28, 26))
         self.all_sprites.update(dt)
-        self.all_sprites.draw(self.player.rect.center)
+        self.all_sprites.draw(self.player)
