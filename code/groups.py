@@ -27,15 +27,15 @@ class CameraGroup(AllSprites):
 
         if target.rect.left < self.camera_rect.left:
             self.camera_rect.left = target.rect.left
-        if target.rect.right < self.camera_rect.right:
+        if target.rect.right > self.camera_rect.right:
             self.camera_rect.right = target.rect.right
-        if target.rect.top > self.camera_rect.top:
+        if target.rect.top < self.camera_rect.top:
             self.camera_rect.top = target.rect.top
-        if target.rect.bottom < self.camera_rect.bottom:
+        if target.rect.bottom > self.camera_rect.bottom:
             self.camera_rect.bottom = target.rect.bottom
 
-        self.offset.x = self.camera_rect.left - self.camera_borders['left']
-        self.offset.y = self.camera_rect.top - self.camera_borders['top']
+        self.offset.x = -self.camera_rect.left + self.camera_borders['left']
+        self.offset.y = -self.camera_rect.top + self.camera_borders['top']
 
     def draw(self, player):
         self.box_camera(player)
@@ -43,11 +43,6 @@ class CameraGroup(AllSprites):
         #active screen elements
         for sprite in self:
             offset_pos = sprite.rect.topleft + self.offset
-            print(self.display_surf)
             self.display_surf.blit(sprite.image, offset_pos)
 
-    #def draw(self, target_pos):
-        #camera pos
-        #self.offset.x = -(target_pos[0] - WINDOW_WIDTH / 2)
-        #self.offset.y = -(target_pos[1] - WINDOW_HEIGHT / 2)
-        
+

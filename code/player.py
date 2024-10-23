@@ -22,8 +22,8 @@ class Player(pygame.sprite.Sprite):
         self.jump_height = 5
         self.bonus_jumps = 1
         self.dash = False
-        self.dashx_multi = 2
-        self.dashy_multi = 1.4
+        self.dashx_multi = 4
+        self.dashy_multi = 1.6
         self.dash_num = 1
         self.input_vector = vector()
 
@@ -76,14 +76,11 @@ class Player(pygame.sprite.Sprite):
         #print(self.input_vector)
         #horizontal
         self.direction.x += self.input_vector.x * self.speed
-        
-        #self.image.fill('blue')
-        if self.dash_num < 1:
-            #self.image.fill('red')
-            if self.timers['dash'].active:
-                self.dash_num -= 1
-                self.direction.x = self.direction.x * self.speed * self.dashx_multi * dt 
-                self.direction.y = self.direction.y * self.speed * self.dashy_multi * dt
+
+        if self.timers['dash'].active:
+            self.dash_num -= 1
+            self.direction.x = self.direction.x * self.speed * self.dashx_multi * dt 
+            self.direction.y = self.direction.y * self.speed * self.dashy_multi * dt
             
         #drag
         self.direction.x *= 0.80
