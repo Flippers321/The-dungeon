@@ -22,7 +22,7 @@ class Player(pygame.sprite.Sprite):
         self.jump_height = 5
         self.bonus_jumps = 1
         self.dash = False
-        self.dashx_multi = 4
+        self.dashx_multi = 3
         self.dashy_multi = 1.6
         self.dash_num = 1
         self.input_vector = vector()
