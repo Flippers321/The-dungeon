@@ -49,12 +49,9 @@ class CameraGroup(AllSprites):
         if keys[pygame.K_EQUALS]:
             if self.zoom_scale < 2.0:
                 self.zoom_scale += 0.1
-        #print(self.zoom_scale)
         
-        #scaling box camera boarders TODO maybe scale the whole dictionary instead?
-        original_center = self.camera_rect.center
-        self.camera_rect.size = self.default_camera_size / self.zoom_scale
-        self.camera_rect.center = original_center
+        # changing where the box camera is positioned when zooming in
+        self.camera_borders['left'] * self.zoom_scale == self.camera_borders['left']
 
 
     def draw(self, player):
