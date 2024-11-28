@@ -6,7 +6,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, pos, groups, collision_sprites, frames):
         #setup
         super().__init__(groups)
-        self.z = Z_LAYERS['default']
+        self.z = Z_LAYERS['entity']
         
         #image
         self.frames, self.frame_index = frames, 0

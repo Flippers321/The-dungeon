@@ -40,7 +40,7 @@ class CameraGroup(AllSprites):
 
         self.offset.x = -self.camera_rect.left + self.camera_borders['left']
         self.offset.y = -self.camera_rect.top + self.camera_borders['top']
-        
+
     def zoom_camera(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_MINUS]:
@@ -51,8 +51,13 @@ class CameraGroup(AllSprites):
                 self.zoom_scale += 0.1
         
         # changing where the box camera is positioned when zooming in
-        self.camera_borders['left'] * self.zoom_scale == self.camera_borders['left']
+        original_center = self.camera_rect.center
+        self.camera_rect.size = self.default_camera_size / self.zoom_scale
+        self.camera_rect.center = original_center
+        ##change offset TOO!!
 
+        
+        #self.camera_rect = self.camera_rect / self.zoom_scale
 
     def draw(self, player):
         self.box_camera(player)

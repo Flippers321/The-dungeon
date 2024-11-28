@@ -1,6 +1,7 @@
 from settings import *
 from sprites import Sprite
 from player import Player
+from enemy import Enemy
 from groups import CameraGroup
 
 ##level 2 moving platforms?
@@ -30,10 +31,19 @@ class Level:
         for obj in tmx_map.get_layer_by_name('spawn'):
             if obj.name == 'start':
                 self.player = Player(
-                    pos =(obj.x, obj.y), 
+                    pos = (obj.x, obj.y), 
                     groups = self.all_sprites, 
                     collision_sprites = self.collision_sprites,
                     frames = obj_frames['player'])
+
+        #for obj in tmx_map.get_layer_by_name('spawn'):
+        #    if obj.name == 'enemy':
+        #        self.enemy = Enemy(
+        #            pos = (obj.x, obj.y),
+        #            groups = self.all_sprites,
+        #            collision_sprites = self.collision_sprites,
+        #            frames = obj_frames['enemy'])
+            
             
             
     def run(self, dt):

@@ -14,6 +14,6 @@ Z_LAYERS = {
     'background obj': 2,
     'chains': 3,
     'spikes': 4,
-    'default': 5,
+    'entity': 5,
     
 }

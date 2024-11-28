@@ -1,7 +1,7 @@
 from settings import *
 
 class Sprite(pygame.sprite.Sprite):
-    def __init__(self, pos, surf = pygame.Surface((16,16)), groups = None, z = Z_LAYERS['default']):
+    def __init__(self, pos, surf = pygame.Surface((16,16)), groups = None, z = Z_LAYERS['entity']):
         super().__init__(groups) #adding sprite to group/s
         self.image = surf
         if self.image == None:
@@ -12,7 +12,7 @@ class Sprite(pygame.sprite.Sprite):
         self.z = z
         
 class AnimatedSprite(Sprite):
-    def __init__(self, pos, frames, groups, z  = Z_LAYERS['default'], animation_speed = ANIMATION_SPEED):
+    def __init__(self, pos, frames, groups, z  = Z_LAYERS['entity'], animation_speed = ANIMATION_SPEED):
         self.frames, self.frame_index = frames, 0
         super().__init__(pos, self.frames[self.frame_index], groups = groups, z = z)
         self.animation_speed = animation_speed

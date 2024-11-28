@@ -17,7 +17,8 @@ class Game:
         
     def import_sprites(self):
         self.obj_frames = {
-            'player': import_sub_folders('assets/Miner')
+            'player': import_sub_folders('assets/Miner'),
+            'enemy': import_sub_folders('assets/Slime')
         }
         
     def run(self):
