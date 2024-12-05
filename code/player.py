@@ -3,7 +3,7 @@ from timer import Timer
 from os.path import join 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos, groups, collision_sprites, frames):
+    def __init__(self, pos, groups, collision_sprites, damage_sprites, health, frames):
         #setup
         super().__init__(groups)
         self.z = Z_LAYERS['entity']
@@ -29,17 +29,20 @@ class Player(pygame.sprite.Sprite):
         self.dashx_multi = 3
         self.dashy_multi = 1.6
         self.dash_num = 1
+        self.health = health
         self.input_vector = vector()
 
         #collision detection
         self.collision_sprites = collision_sprites
+        self.damage_sprites = damage_sprites
         self.on_surface = {'floor': False, 'left': False, 'right': False, 'roof': False}
 
         #timer
         self.timers = {
             'wall jump': Timer(400),
             'wall slide': Timer(250),
-            'dash': Timer(50)
+            'dash': Timer(50),
+            'damage': Timer(1000)
         }
 
     def input(self):
@@ -142,6 +145,7 @@ class Player(pygame.sprite.Sprite):
 
     def collision(self, axis):
         for sprite in self.collision_sprites:
+            #collision of walls and platforms
             if sprite.rect.colliderect(self.rect):
                 if axis == 'horizontal':
                     # left
@@ -160,6 +164,17 @@ class Player(pygame.sprite.Sprite):
                     if self.rect.bottom >= sprite.rect.top and int(self.old_rect.bottom) <= int(sprite.old_rect.top):
                         self.rect.bottom = sprite.rect.top
                         self.direction.y = 0
+
+        for sprite in self.damage_sprites:
+            if sprite.rect.colliderect(self.rect):
+                if not self.timers['damage'].active:
+                    self.health -= 1
+                    self.timers['damage'].active
+                    print(self.health)
+                    #TODO : fix health decrease, make a death
+
+        def death(self):
+            pass
 
     def update_timers(self):
         for timer in self.timers.values():

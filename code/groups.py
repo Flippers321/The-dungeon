@@ -51,13 +51,7 @@ class CameraGroup(AllSprites):
                 self.zoom_scale += 0.1
         
         # changing where the box camera is positioned when zooming in
-        original_center = self.camera_rect.center
-        self.camera_rect.size = self.default_camera_size / self.zoom_scale
-        self.camera_rect.center = original_center
-        ##change offset TOO!!
 
-        
-        #self.camera_rect = self.camera_rect / self.zoom_scale
 
     def draw(self, player):
         self.box_camera(player)

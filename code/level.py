@@ -13,6 +13,7 @@ class Level:
         #groups
         self.all_sprites = CameraGroup()
         self.collision_sprites = pygame.sprite.Group()
+        self.damage_sprites = pygame.sprite.Group()
         
         self.setup(tmx_map, obj_frames)
     
@@ -24,6 +25,7 @@ class Level:
                 groups = [self.all_sprites]
                 if layer == 'cave': groups.append(self.collision_sprites)
                 if layer == 'platforms': groups.append(self.collision_sprites)
+                if layer == 'spikes': groups.append(self.damage_sprites)
                 z = Z_LAYERS['climbing chains']
                 Sprite((x * TILE_SIZE, y * TILE_SIZE), surf, groups, z)
         
@@ -34,6 +36,8 @@ class Level:
                     pos = (obj.x, obj.y), 
                     groups = self.all_sprites, 
                     collision_sprites = self.collision_sprites,
+                    damage_sprites = self.damage_sprites,
+                    health = 3,
                     frames = obj_frames['player'])
 
         #for obj in tmx_map.get_layer_by_name('spawn'):
