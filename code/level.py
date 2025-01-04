@@ -31,9 +31,11 @@ class Level:
         
         #spawn objects
         for obj in tmx_map.get_layer_by_name('spawn'):
+            if obj.name == 'end':
+                self.player.end_pos = pygame.Rect(obj.x, obj.y, obj.width, obj.height)
             if obj.name == 'start':
                 self.player = Player(
-                    pos = (obj.x, obj.y), 
+                    pos = (obj.x, obj.y),
                     groups = self.all_sprites, 
                     collision_sprites = self.collision_sprites,
                     damage_sprites = self.damage_sprites,

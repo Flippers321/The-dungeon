@@ -3,7 +3,7 @@ from timer import Timer
 from os.path import join 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos, groups, collision_sprites, damage_sprites, health, frames):
+    def __init__(self, pos,  groups, collision_sprites, damage_sprites, health, frames):
         #setup
         super().__init__(groups)
         self.z = Z_LAYERS['entity']
@@ -13,6 +13,8 @@ class Player(pygame.sprite.Sprite):
         self.image = self.frames['idle'][self.frame_index]
         #self.image.fill('blue')
 
+        self.respawn = pos
+        self.end_pos = (0,0)
         #rects
         self.rect = self.image.get_frect(topleft = pos)
         self.old_rect = self.rect.copy()
@@ -171,10 +173,15 @@ class Player(pygame.sprite.Sprite):
                     self.health -= 1
                     self.timers['damage'].active
                     print(self.health)
+                self.rect = self.image.get_frect(topleft = self.respawn)
                     #TODO : fix health decrease, make a death
 
-        def death(self):
-            pass
+    def death(self):
+        pass
+    
+    def check_win(self):
+        if self.rect.colliderect(self.end_pos):
+            self.rect = self.image.get_frect(topleft = self.respawn)
 
     def update_timers(self):
         for timer in self.timers.values():
@@ -189,6 +196,7 @@ class Player(pygame.sprite.Sprite):
             self.bonus_jumps = 1
             self.dash_num = 1
         self.move(dt)
+        self.check_win()
         #self.dash_timer(dt)
         self.check_contacts()
         #print(self.timers['wall jump'].active)
