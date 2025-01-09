@@ -43,7 +43,7 @@ class Player(pygame.sprite.Sprite):
         self.timers = {
             'wall jump': Timer(400),
             'wall slide': Timer(250),
-            'dash': Timer(50),
+            'dash': Timer(5),
             'damage': Timer(1000)
         }
 
@@ -168,16 +168,18 @@ class Player(pygame.sprite.Sprite):
                         self.direction.y = 0
 
         for sprite in self.damage_sprites:
-            if sprite.rect.colliderect(self.rect):
-                if not self.timers['damage'].active:
-                    self.health -= 1
-                    self.timers['damage'].active
-                    print(self.health)
-                self.rect = self.image.get_frect(topleft = self.respawn)
-                    #TODO : fix health decrease, make a death
+            if sprite.rect.colliderect(self.rect) and not self.timers['damage'].active:
+                self.health -= 1
+                self.timers['damage'].activate()
+                
+                print(self.health)
+                if self.health <= 0:
+                    self.death()
+                    
+
 
     def death(self):
-        pass
+        self.rect = self.image.get_frect(topleft = self.respawn)
     
     def check_win(self):
         if self.rect.colliderect(self.end_pos):
