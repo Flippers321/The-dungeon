@@ -9,10 +9,6 @@ class Player(pygame.sprite.Sprite):
         self.z = Z_LAYERS['entity']
         
         #image
-        self.frames, self.frame_index = frames, 0
-        self.image = self.frames['idle'][self.frame_index]
-        #self.image.fill('blue')
-
         self.respawn = pos
         self.end_pos = (0,0)
         #rects
@@ -31,7 +27,7 @@ class Player(pygame.sprite.Sprite):
         self.dashx_multi = 3
         self.dashy_multi = 1.6
         self.dash_num = 1
-        self.health = health
+        self.health = self.max_health = health
         self.input_vector = vector()
 
         #collision detection
@@ -44,7 +40,7 @@ class Player(pygame.sprite.Sprite):
             'wall jump': Timer(400),
             'wall slide': Timer(250),
             'dash': Timer(5),
-            'damage': Timer(1000)
+            'damage': Timer(300)
         }
 
     def input(self):
@@ -88,9 +84,12 @@ class Player(pygame.sprite.Sprite):
 
         if self.timers['dash'].active:
             self.dash_num -= 1
-            self.direction.x = self.direction.x * self.speed * self.dashx_multi * dt 
+            self.direction.x = self.direction.x * self.speed * self.dashx_multi * dt
             self.direction.y = self.direction.y * self.speed * self.dashy_multi * dt
             
+        if self.timers['damage'].active:
+            self.direction.x = self.direction.x / 1.15
+            self.direction.y = self.direction.y / 1.15
         #drag
         self.direction.x *= 0.80
         ###do seperate drag for dashing???
@@ -171,7 +170,6 @@ class Player(pygame.sprite.Sprite):
             if sprite.rect.colliderect(self.rect) and not self.timers['damage'].active:
                 self.health -= 1
                 self.timers['damage'].activate()
-                
                 print(self.health)
                 if self.health <= 0:
                     self.death()
@@ -180,6 +178,7 @@ class Player(pygame.sprite.Sprite):
 
     def death(self):
         self.rect = self.image.get_frect(topleft = self.respawn)
+        self.health = self.max_health
     
     def check_win(self):
         if self.rect.colliderect(self.end_pos):

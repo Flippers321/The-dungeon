@@ -42,6 +42,14 @@ class Level:
                     health = 3,
                     frames = obj_frames['player'])
 
+                if obj.name == 'enemy':
+                    self.enemy = Enemy(
+                        pos = (obj.x, obj.y),
+                        groups = self.all_sprites,
+                        collision_sprites = self.collision_sprites,   
+                        frames = obj_frames['enemy'])
+
+
         #for obj in tmx_map.get_layer_by_name('spawn'):
         #    if obj.name == 'enemy':
         #        self.enemy = Enemy(
