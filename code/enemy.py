@@ -2,7 +2,7 @@ from settings import *
 from timer import Timer
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, pos, groups, collision_sprites, frames):
+    def __init__(self, pos, groups, collision_sprites, health, frames):
         super().__init__(groups)
         self.z = Z_LAYERS['entity']
 

@@ -7,6 +7,9 @@ class Player(pygame.sprite.Sprite):
         #setup
         super().__init__(groups)
         self.z = Z_LAYERS['entity']
+
+        self.frames, self.frame_index = frames, 0
+        self.image = self.frames['idle'][self.frame_index]
         
         #image
         self.respawn = pos
@@ -179,10 +182,7 @@ class Player(pygame.sprite.Sprite):
     def death(self):
         self.rect = self.image.get_frect(topleft = self.respawn)
         self.health = self.max_health
-    
-    def check_win(self):
-        if self.rect.colliderect(self.end_pos):
-            self.rect = self.image.get_frect(topleft = self.respawn)
+
 
     def update_timers(self):
         for timer in self.timers.values():
@@ -197,7 +197,6 @@ class Player(pygame.sprite.Sprite):
             self.bonus_jumps = 1
             self.dash_num = 1
         self.move(dt)
-        self.check_win()
         #self.dash_timer(dt)
         self.check_contacts()
         #print(self.timers['wall jump'].active)

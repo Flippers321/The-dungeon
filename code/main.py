@@ -12,8 +12,10 @@ class Game:
         self.clock = pygame.time.Clock()
         self.import_sprites()
         
-        self.tmx_maps = {0: load_pygame('data/levels/tutorial.tmx')} #!!
-        self.current_stage = Level(self.tmx_maps[0], self.obj_frames)
+        self.tmx_maps = [load_pygame('data/levels/tutorial.tmx'),
+                         load_pygame('data/levels/level2.tmx')]
+        self.level_count = 0
+        self.current_stage = Level(self.tmx_maps[self.level_count], self.obj_frames)
         
     def import_sprites(self):
         self.obj_frames = {
@@ -28,8 +30,12 @@ class Game:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-            
+
             self.current_stage.run(dt)
+            if self.current_stage.check_win():
+                self.level_count += 1
+                self.current_stage = Level(self.tmx_maps[self.level_count], self.obj_frames)
+
             
             pygame.display.update()
             

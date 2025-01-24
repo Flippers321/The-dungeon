@@ -20,8 +20,9 @@ class Level:
     #getting pos of values stored in layer
     def setup(self, tmx_map, obj_frames):
         #tiles
-        for layer in ['gem', 'spikes', 'platforms', 'cave', 'climbing chains', 'background obj']:
-            for x,y,surf in (tmx_map.get_layer_by_name(layer).tiles()):
+        for layer in tmx_map.visible_tile_layers:    #['gem', 'spikes', 'platforms', 'cave', 'climbing chains', 'background obj']:
+            for x,y,surf in (tmx_map.layers[layer].tiles()):  #get_layer_by_name(layer)
+                #layer object now contains numbers instead of names, get the names 
                 groups = [self.all_sprites]
                 if layer == 'cave': groups.append(self.collision_sprites)
                 if layer == 'platforms': groups.append(self.collision_sprites)
@@ -46,8 +47,14 @@ class Level:
                     self.enemy = Enemy(
                         pos = (obj.x, obj.y),
                         groups = self.all_sprites,
-                        collision_sprites = self.collision_sprites,   
+                        collision_sprites = self.collision_sprites, 
+                        health = 1,
                         frames = obj_frames['enemy'])
+
+    def check_win(self):
+        if self.player.rect.colliderect(self.player.end_pos):
+            return True
+            self.rect = self.image.get_frect(topleft = self.respawn)
 
 
         #for obj in tmx_map.get_layer_by_name('spawn'):
@@ -63,4 +70,5 @@ class Level:
     def run(self, dt):
         self.display_surface.fill((38, 28, 26))
         self.all_sprites.update(dt)
+        self.check_win()
         self.all_sprites.draw(self.player)
