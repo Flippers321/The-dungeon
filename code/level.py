@@ -20,8 +20,8 @@ class Level:
     #getting pos of values stored in layer
     def setup(self, tmx_map, obj_frames):
         #tiles
-        for layer in tmx_map.visible_tile_layers:    #['gem', 'spikes', 'platforms', 'cave', 'climbing chains', 'background obj']:
-            for x,y,surf in (tmx_map.layers[layer].tiles()):  #get_layer_by_name(layer)
+        for layer in ['spikes', 'platforms', 'cave', 'climbing chains', 'background obj']:
+            for x,y,surf in tmx_map.get_layer_by_name(layer).tiles():
                 #layer object now contains numbers instead of names, get the names 
                 groups = [self.all_sprites]
                 if layer == 'cave': groups.append(self.collision_sprites)
