@@ -1,7 +1,7 @@
 from settings import *
 from sprites import Sprite
 from player import Player
-from enemy import Enemy
+from enemy import Slime
 from groups import CameraGroup
 
 ##level 2 moving platforms?
@@ -44,7 +44,7 @@ class Level:
                     frames = obj_frames['player'])
 
                 if obj.name == 'enemy':
-                    self.enemy = Enemy(
+                    self.enemy = Slime(
                         pos = (obj.x, obj.y),
                         groups = self.all_sprites,
                         collision_sprites = self.collision_sprites, 
