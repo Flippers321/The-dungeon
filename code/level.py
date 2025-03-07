@@ -3,10 +3,9 @@ from sprites import Sprite
 from player import Player
 from enemy import Enemy
 from groups import CameraGroup
+from UI import Menu
 
-##level 2 moving platforms?
-
-class Level:
+class Level():
     def __init__(self, tmx_map, obj_frames):
         self.display_surface = pygame.display.get_surface()
         
@@ -16,6 +15,8 @@ class Level:
         self.damage_sprites = pygame.sprite.Group()
         
         self.setup(tmx_map, obj_frames)
+        
+        self.menu = Menu()
     
     #getting pos of values stored in layer
     def setup(self, tmx_map, obj_frames):
@@ -49,26 +50,23 @@ class Level:
                         groups = self.all_sprites,
                         collision_sprites = self.collision_sprites, 
                         health = 1,
-                        frames = obj_frames['enemy'])
+                        frames = obj_frames['enemy'])                
 
     def check_win(self):
         if self.player.rect.colliderect(self.player.end_pos):
             return True
             self.rect = self.image.get_frect(topleft = self.respawn)
-
-
-        #for obj in tmx_map.get_layer_by_name('spawn'):
-        #    if obj.name == 'enemy':
-        #        self.enemy = Enemy(
-        #            pos = (obj.x, obj.y),
-        #            groups = self.all_sprites,
-        #            collision_sprites = self.collision_sprites,
-        #            frames = obj_frames['enemy'])
             
-            
+    def draw_menu(self):
+        if self.menu.game_paused == True:
+            self.menu.draw(self.display_surface)
+        else:
+            self.menu.draw_text('Press ESC to pause', (100, 100, 100), 20, 20, self.display_surface)
             
     def run(self, dt):
         self.display_surface.fill((38, 28, 26))
         self.all_sprites.update(dt)
         self.check_win()
         self.all_sprites.draw(self.player)
+        self.draw_menu()
+        self.menu.paused(self.display_surface)
