@@ -170,16 +170,20 @@ class Player(pygame.sprite.Sprite):
                         self.rect.bottom = sprite.rect.top
                         self.direction.y = 0
 
-        for sprite in self.damage_sprites or self.enemy_sprites:
+        for sprite in self.damage_sprites:
             if sprite.rect.colliderect(self.rect) and not self.timers['damage'].active:
                 self.health -= 1
                 self.timers['damage'].activate()
                 print(self.health)
                 if self.health <= 0:
                     self.death()
+
+        for sprite in self.enemy_sprites:
+            if sprite.rect.colliderect(self.rect):
+                self.death()
+                self.timers['damage'].activate()
+                print('death to enemy')
                     
-
-
     def death(self):
         self.rect = self.image.get_frect(topleft = self.respawn)
         self.health = self.max_health
