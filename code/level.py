@@ -62,11 +62,15 @@ class Level():
             self.menu.draw(self.display_surface)
         else:
             self.menu.draw_text('Press ESC to pause', (100, 100, 100), 20, 20, self.display_surface)
-            
+     
+    def score(self):
+        pass
+        #if player movement start score, only increase score if paused = False
+           
     def run(self, dt):
         self.display_surface.fill((38, 28, 26))
         self.all_sprites.update(dt)
         self.check_win()
         self.all_sprites.draw(self.player)
         self.draw_menu()
-        self.menu.paused(self.display_surface)
+        self.menu.menu_state(self.display_surface)

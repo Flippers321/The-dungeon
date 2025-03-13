@@ -1,5 +1,7 @@
 from settings import *
 
+
+
 class Button:
     def __init__(self, x, y, image, scale):
         width = image.get_width()
@@ -7,7 +9,7 @@ class Button:
         self.image = pygame.transform.scale(image, (int(width * scale), int(height * scale)))
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
-        self.clicked = False
+        self.clicked = False ##get rid of this
         
     def draw(self, surface):
         
@@ -17,46 +19,67 @@ class Button:
         if self.rect.collidepoint(pos):
             if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
                 self.clicked = True
-                action = True
+                return True
                 
         if pygame.mouse.get_pressed()[0] == 0:
             self.clicked = False
             
         surface.blit(self.image, (self.rect.x, self.rect.y))
-        
-class Score: 
-    pass ## draw text of score
+        return False
+
 class Menu:
     def __init__(self):
         
         
         self.font = pygame.font.Font(r'assets\Perfect DOS VGA 437.ttf', 16)
         self.game_paused = False
+        self.menu_butttons_offset_5 = 2.5 * 16
         
         #load images
         self.button_images = {'resume': pygame.image.load(r'assets\Buttons\resume.png').convert_alpha(),
                               'options': pygame.image.load(r'assets\Buttons\options.png').convert_alpha(),
                               'leaderboard': pygame.image.load(r'assets\Buttons\leaderboard.png').convert_alpha(),
                               'restart': pygame.image.load(r'assets\Buttons\restart.png').convert_alpha(),
+                              'quit': pygame.image.load(r'assets\Buttons\quit.png').convert_alpha(),
                               }
         
         #button instances
-        self.buttons = [Button(WINDOW_WIDTH / 2, 100, self.button_images['resume'], 5), # scaled so img = 80 x 80
-                         Button(WINDOW_WIDTH / 2, 250, self.button_images['options'], 5),
-                         Button(WINDOW_WIDTH / 2, 400, self.button_images['leaderboard'], 5),
-                         Button(WINDOW_WIDTH / 2, 550, self.button_images['restart'], 5)]
+        self.buttons = [Button((WINDOW_WIDTH / 2) - self.menu_butttons_offset_5, 100, self.button_images['resume'], 5), # scaled so img = 80 x 80
+                         Button((WINDOW_WIDTH / 2) - self.menu_butttons_offset_5, 250, self.button_images['options'], 5),
+                         Button((WINDOW_WIDTH / 2) - self.menu_butttons_offset_5, 400, self.button_images['leaderboard'], 5),
+                         Button((WINDOW_WIDTH / 2) - self.menu_butttons_offset_5, 550, self.button_images['restart'], 5),
+                         Button(WINDOW_WIDTH - (16 * 3), 0, self.button_images['quit'], 3)]  # scaled so img = 80 x 80]
         
-        
-    def paused(self, surface):
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_ESCAPE]:
+    def menu_state(self, surface): #should i make menu state a dictionary that then uses teh value in the dict to do things
+        keys = pygame.key.get_just_pressed()
+        if keys[pygame.K_ESCAPE] and self.game_paused == False:
             self.game_paused = True
-            print('pressed')
+            print(self.game_paused)
+        elif keys[pygame.K_ESCAPE] and self.game_paused == True:
+            self.game_paused = False
+            print(self.game_paused)
+            
             ##blur screen and make score stop, make player and enemy stop movement.
         if self.game_paused == True:    
-            surface = pygame.transform.box_blur(surface, 2) ##???
+            surface = pygame.transform.box_blur(surface, 2) #bluriong every frame then drawing on top every frame
             
-         
+    def actions(self, surface):
+        if self.game_paused == False:
+            self.draw_text('press ESC to pause', self.font, self.text_colour)
+        if self.game_paused == True:
+            if self.buttons[0].draw(surface):
+                self.game_paused = False
+                print(self.game_paused)
+            elif self.buttons[1].draw(surface):
+                pass
+            elif self.buttons[2].draw(surface):
+                pass
+            elif self.buttons[3].draw(surface):
+                pass
+            elif self.buttons[4].draw(surface):
+                pygame.quit()
+                sys.exit()
+                
     def draw_text(self, text, colour, x, y, surface):
         img = self.font.render(text, True, colour)
         surface.blit(img, (x,y))
@@ -64,15 +87,7 @@ class Menu:
     def draw(self, surface):
         for button in self.buttons:
             button.draw(surface)
-        
-    def check_paused(self):
-        if self.game_paused:
-            print('game paused')
-            #display menu
-        else:
-            self.draw_text('press ESC to pause', self.font, self.text_colour)
             
-    ##def actions:: unpause = press resume or press esc when paused = True
             
 
         
