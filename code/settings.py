@@ -15,5 +15,4 @@ Z_LAYERS = {
     'chains': 3,
     'spikes': 4,
     'entity': 5,
-    
 }

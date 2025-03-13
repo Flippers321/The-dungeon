@@ -3,7 +3,7 @@ from timer import Timer
 from os.path import join 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos,  groups, collision_sprites, damage_sprites, health, frames):
+    def __init__(self, pos,  groups, collision_sprites, damage_sprites, enemy_sprites, health, frames):
         #setup
         super().__init__(groups)
         self.z = Z_LAYERS['entity']
@@ -36,6 +36,7 @@ class Player(pygame.sprite.Sprite):
         #collision detection
         self.collision_sprites = collision_sprites
         self.damage_sprites = damage_sprites
+        self.enemy_sprites = enemy_sprites
         self.on_surface = {'floor': False, 'left': False, 'right': False, 'roof': False}
 
         #timer
@@ -169,7 +170,7 @@ class Player(pygame.sprite.Sprite):
                         self.rect.bottom = sprite.rect.top
                         self.direction.y = 0
 
-        for sprite in self.damage_sprites:
+        for sprite in self.damage_sprites or self.enemy_sprites:
             if sprite.rect.colliderect(self.rect) and not self.timers['damage'].active:
                 self.health -= 1
                 self.timers['damage'].activate()

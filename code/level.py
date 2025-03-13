@@ -13,6 +13,7 @@ class Level():
         self.all_sprites = CameraGroup()
         self.collision_sprites = pygame.sprite.Group()
         self.damage_sprites = pygame.sprite.Group()
+        self.enemy_sprites = pygame.sprite.Group()
         
         self.setup(tmx_map, obj_frames)
         
@@ -41,16 +42,16 @@ class Level():
                     groups = self.all_sprites, 
                     collision_sprites = self.collision_sprites,
                     damage_sprites = self.damage_sprites,
+                    enemy_sprites = self.enemy_sprites,
                     health = 3,
                     frames = obj_frames['player'])
-
-                if obj.name == 'enemy':
-                    self.enemy = Slime(
-                        pos = (obj.x, obj.y),
-                        groups = self.all_sprites,
-                        collision_sprites = self.collision_sprites, 
-                        health = 1,
-                        frames = obj_frames['enemy'])                
+            if obj.name == 'enemy':
+                self.enemy = Slime(
+                    pos = (obj.x, obj.y),
+                    groups = self.all_sprites,
+                    collision_sprites = self.enemy_sprites, 
+                    health = 1,
+                    frames = obj_frames['enemy'])
 
     def check_win(self):
         if self.player.rect.colliderect(self.player.end_pos):
@@ -74,3 +75,4 @@ class Level():
         self.all_sprites.draw(self.player)
         self.draw_menu()
         self.menu.menu_state(self.display_surface)
+        self.menu.actions(self.display_surface)
