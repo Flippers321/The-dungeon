@@ -69,7 +69,7 @@ class Level():
         #if player movement start score, only increase score if paused = False
            
     def run(self, dt):
-        self.display_surface.fill((38, 28, 26))
+        self.display_surface.fill(BACKGROUND_COLOUR)
         self.all_sprites.update(dt)
         self.check_win()
         self.all_sprites.draw(self.player)

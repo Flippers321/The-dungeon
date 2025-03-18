@@ -18,25 +18,56 @@ class Button:
     def get_click(self):
                 
         pos = pygame.mouse.get_pos()
+        pressed = pygame.mouse.get_just_pressed()
         
         #checking if mouse id on button and the clicked condtion
         if self.rect.collidepoint(pos):
-            if pygame.mouse.get_just_pressed()[0] == 1:
+            if pressed[0] == 1:
                 print('clicked')
                 return True
             
-class slider:
+class Slider:
     def __init__(self, pos, size, initial_val, min, max):
         self.pos = pos
         self.size = size
-        
+        boldness = size[0] * 0.05
+        slider_scale = 1.1
+        inner_scale = 2/3
+     
+        #making the input pos the centre
         self.slider_left_pos = self.pos[0] - (size[0]//2)
-        self.slider_rigt_pos = self.pos[0] + (size[0]//2)
+        self.slider_right_pos = self.pos[0] + (size[0]//2)
         self.slider_top_pos = self.pos[1] - (size[1]//2)
         
         self.min = min
         self.max = max
-        self.initial_val = (self.slider_right_pos - self.slider_left_pos) * initial_val # percentage        
+        self.initial_val = (self.slider_right_pos - self.slider_left_pos) * initial_val # percentage so 0.1 = 10% along
+        
+        self.container_rect = pygame.Rect(self.slider_left_pos, self.slider_top_pos, self.size[0], self.size[1])
+        self.slider_rect = pygame.Rect(self.slider_left_pos + self.initial_val - (self.size[0]//2), self.slider_top_pos, boldness, self.size[1])
+        self.slider_rect_inner = pygame.Rect(0, 0, boldness * inner_scale, self.size[1] * inner_scale)
+        self.slider_rect_inner.center = self.slider_rect.center
+        
+    def get_click(self):
+        pos = pygame.mouse.get_pos()
+        pressed = pygame.mouse.get_pressed()
+        
+        #checking if mouse id on button and the clicked condtion
+        if self.container_rect.collidepoint(pos):
+            if pressed[0] == 1:
+                self.move_slider(pos)
+                print('clicked')
+                return True
+
+    def move_slider(self, mouse_pos):
+        self.slider_rect.centerx = mouse_pos[0]
+        self.slider_rect_inner.centerx = mouse_pos[0]
+    
+    def draw(self, surface):
+        pygame.draw.rect(surface, (30, 20, 18), self.container_rect)
+        pygame.draw.rect(surface, (45, 35, 33), self.slider_rect)
+        pygame.draw.rect(surface, (65, 55, 52), self.slider_rect_inner)
+        
 class Menu:
     def __init__(self):
         
@@ -63,7 +94,10 @@ class Menu:
                          Button(((WINDOW_WIDTH / 2), 570), self.button_images['restart'], 5),
                          Button((WINDOW_WIDTH - 25, 25), self.button_images['quit'], 3)]  # scaled so img = 80 x 80]
         
-        self.buttons_options = [Button(((WINDOW_WIDTH / 2), 120), self.button_images['resume'], 5)]
+        self.buttons_options = [Button(((WINDOW_WIDTH / 2), 120), self.button_images['resume'], 5),
+                                Button((WINDOW_WIDTH - 25, 25), self.button_images['quit'], 3)]
+        self.sliders = [Slider(((WINDOW_WIDTH / 2), 420), (600, 40), 0.5, 0, 100)]
+        ## top fo vertical, just make taller than wide and change y to be mouse y instead
         
     def menu_state(self, surface): #should i make menu state a dictionary that then uses teh value in the dict to do things
         keys = pygame.key.get_just_pressed()
@@ -109,8 +143,14 @@ class Menu:
                 pass
 
             if self.paused_state == "options":
-                if self.buttons_main[0].get_click():
+                if self.buttons_options[0].get_click():
+                    self.paused_state = "main"
                     self.game_paused = False
+                if self.buttons_options[1].get_click():
+                    pygame.quit()
+                    sys.exit()
+                    
+                self.sliders[0].get_click()
                 #slider for volume//input box
 
 
@@ -120,16 +160,17 @@ class Menu:
         surface.blit(img, (x,y))
         
     def draw(self, surface):
+        if self.game_paused == True:
+            surface.fill(BACKGROUND_COLOUR)
         if self.paused_state == "main":
             for button in self.buttons_main:
                 button.draw(surface)
         if self.paused_state == "options":
             for button in self.buttons_options:
                 button.draw(surface)
+            for slider in self.sliders:
+                slider.draw(surface)
                 
-
-    def clear(self, surface):
-        pass
             
             
 
