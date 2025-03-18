@@ -29,7 +29,12 @@ class Menu:
         
         
         self.font = pygame.font.Font(r'assets\Perfect DOS VGA 437.ttf', 16)
+
+        #menu states
         self.game_paused = False
+        self.paused_state = "main"
+
+        #offset to make the buttons be centered on the point chosen
         self.menu_butttons_offset_5 = 2.5 * 16
         
         #load images
@@ -49,13 +54,17 @@ class Menu:
         
     def menu_state(self, surface): #should i make menu state a dictionary that then uses teh value in the dict to do things
         keys = pygame.key.get_just_pressed()
-        if keys[pygame.K_ESCAPE] and self.game_paused == False:
+        if keys[pygame.K_ESCAPE] and self.game_paused == False :
             self.game_paused = True
             surface = pygame.transform.box_blur(surface, 2)#bluriong every frame then drawing on top every frame
             print(self.game_paused)
-        elif keys[pygame.K_ESCAPE] and self.game_paused == True:
+        elif keys[pygame.K_ESCAPE] and self.game_paused == True and self.paused_state == "main":
             self.game_paused = False
-            print(self.game_paused)  
+            print(self.game_paused) 
+        elif keys[pygame.K_ESCAPE] and self.game_paused == True and self.paused_state != "main":
+            self.paused_state = "main"
+            print('back to main menu')
+            print(self.paused_state)
             
             ##blur screen and make score stop, make player and enemy stop movement.
         self.actions(surface)
@@ -63,19 +72,31 @@ class Menu:
             
     def actions(self, surface):
         if self.game_paused == True:
-            if self.buttons[0].draw(surface):
-                print('resume')
-                self.game_paused = False
-                print(self.game_paused)
-            elif self.buttons[1].draw(surface):
+            if self.paused_state == "main":
+                if self.buttons[0].draw(surface):
+                    print('resume')
+                    self.game_paused = False
+                    print(self.game_paused)
+                elif self.buttons[1].draw(surface):
+                    self.paused_state = "options"
+                    print(self.paused_state)
+                elif self.buttons[2].draw(surface):
+                    self.paused_state = "leaderboard"
+                elif self.buttons[3].draw(surface):
+                    pass #"restart"
+                elif self.buttons[4].draw(surface):
+                    pygame.quit()
+                    sys.exit()
+
+            else:
                 pass
-            elif self.buttons[2].draw(surface):
-                pass
-            elif self.buttons[3].draw(surface):
-                pass
-            elif self.buttons[4].draw(surface):
-                pygame.quit()
-                sys.exit()
+
+            if self.paused_state == "options":
+                if self.buttons[0].draw(surface):
+                    pass
+                #slider for volume//input box
+
+
                 
     def draw_text(self, text, colour, x, y, surface):
         img = self.font.render(text, True, colour)
@@ -84,6 +105,9 @@ class Menu:
     def draw(self, surface):
         for button in self.buttons:
             button.draw(surface)
+
+    def clear(self, surface):
+        pass
             
             
 
