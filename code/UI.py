@@ -20,10 +20,9 @@ class Button:
         pos = pygame.mouse.get_pos()
         pressed = pygame.mouse.get_just_pressed()
         
-        #checking if mouse id on button and the clicked condtion
+        #checking if mouse is clicked on a button
         if self.rect.collidepoint(pos):
             if pressed[0] == 1:
-                print('clicked')
                 return True
             
 class Slider:
@@ -52,7 +51,7 @@ class Slider:
         pos = pygame.mouse.get_pos()
         pressed = pygame.mouse.get_pressed()
         
-        #checking if mouse id on button and the clicked condtion
+        #checking if mouse is clicked on the containder
         if self.container_rect.collidepoint(pos):
             if pressed[0] == 1:
                 self.move_slider(pos)
@@ -68,6 +67,16 @@ class Slider:
         pygame.draw.rect(surface, (45, 35, 33), self.slider_rect)
         pygame.draw.rect(surface, (65, 55, 52), self.slider_rect_inner)
         
+    def get_value(self):
+       value_range = self.slider_right_pos - self.slider_left_pos -1 #pixel range, -1 allows user to easily go to lowest/highest value 
+       slider_value = self.slider_rect.centerx - self.slider_left_pos #value range
+       
+       #getting value of the slider
+       return(slider_value/value_range)*(self.max - self.min) + self.min
+   
+class Highscore:
+    pass
+        
 class Menu:
     def __init__(self):
         
@@ -77,6 +86,7 @@ class Menu:
         #menu states
         self.game_paused = False
         self.paused_state = "main"
+        self.volume = 0 ## read file into here line 111
 
         
         #load images
@@ -98,6 +108,7 @@ class Menu:
                                 Button((WINDOW_WIDTH - 25, 25), self.button_images['quit'], 3)]
         self.sliders = [Slider(((WINDOW_WIDTH / 2), 420), (600, 40), 0.5, 0, 100)]
         ## top fo vertical, just make taller than wide and change y to be mouse y instead
+        ## write to a file with last value ad make that the initial value nect time func
         
     def menu_state(self, surface): #should i make menu state a dictionary that then uses teh value in the dict to do things
         keys = pygame.key.get_just_pressed()
@@ -141,23 +152,24 @@ class Menu:
 
             else:
                 pass
-
+                
+                #options functions
             if self.paused_state == "options":
                 if self.buttons_options[0].get_click():
                     self.paused_state = "main"
                     self.game_paused = False
                 if self.buttons_options[1].get_click():
                     pygame.quit()
-                    sys.exit()
-                    
+                    sys.exit()   
                 self.sliders[0].get_click()
-                #slider for volume//input box
+                self.volume = self.sliders[0].get_value() #returning volume
 
 
                 
     def draw_text(self, text, colour, x, y, surface):
+        text_offset = (len(text)*8 //2)
         img = self.font.render(text, True, colour)
-        surface.blit(img, (x,y))
+        surface.blit(img, (x - text_offset,y))
         
     def draw(self, surface):
         if self.game_paused == True:

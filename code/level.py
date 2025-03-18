@@ -55,12 +55,17 @@ class Level():
 
     def check_win(self):
         if self.player.rect.colliderect(self.player.end_pos):
+            print('win')
             return True
+            
             self.rect = self.image.get_frect(topleft = self.respawn)
             
     def draw_menu(self):
         if self.menu.game_paused == True:
             self.menu.draw(self.display_surface)
+            if self.menu.paused_state == 'options':
+               self.menu.draw_text(f'Volume: {round(self.menu.volume)}', (100, 100, 100), (WINDOW_WIDTH / 2) - 16, 450, self.display_surface)
+
         else:
             self.menu.draw_text('Press ESC to pause', (100, 100, 100), 20, 20, self.display_surface)
      

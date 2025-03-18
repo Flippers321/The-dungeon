@@ -44,7 +44,6 @@ class Player(pygame.sprite.Sprite):
             'wall jump': Timer(400),
             'wall slide': Timer(250),
             'dash': Timer(5),
-            'dash_cooldown': Timer(100),
             'damage': Timer(300)
         }
 
@@ -77,9 +76,9 @@ class Player(pygame.sprite.Sprite):
             self.direction.y = -self.jump_height
             self.bonus_jumps -= 1
             
-        if key_down[pygame.K_LSHIFT] and self.dash_num > 0 and not self.timers['dash_cooldown'].active:
+        if key_down[pygame.K_LSHIFT] and self.dash_num > 0:
             self.timers['dash'].activate()
-            self.timers['dash_cooldown'].activate()
+            # add a way to create a cooldown, maybe with another timer
 
 
     def move(self, dt):
@@ -96,15 +95,10 @@ class Player(pygame.sprite.Sprite):
         if self.timers['damage'].active:
             self.direction.x = self.direction.x / 1.15
             self.direction.y = self.direction.y / 1.15
+            
         #drag
         self.direction.x *= 0.80
-        ###do seperate drag for dashing???
-        # if self.direction.x > 200 or self.direction.x < -200 and not self.timers['dash'].active:
-        #     self.direction.x = 200 if self.direction.x > 200 else -200
-        # if self.direction.x < 0.1 and self.direction.x > -0.1:
-        #     self.direction.x = 0
-        
-        #print(self.dash_num)
+
         self.rect.x += self.direction.x * dt ## make it self.drag? do one for both x and
         self.collision('horizontal')  
         
