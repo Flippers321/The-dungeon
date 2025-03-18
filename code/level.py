@@ -75,4 +75,4 @@ class Level():
         self.all_sprites.draw(self.player)
         self.draw_menu()
         self.menu.menu_state(self.display_surface)
-        self.menu.actions(self.display_surface)
+        self.menu.actions()

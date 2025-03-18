@@ -44,6 +44,7 @@ class Player(pygame.sprite.Sprite):
             'wall jump': Timer(400),
             'wall slide': Timer(250),
             'dash': Timer(5),
+            'dash_cooldown': Timer(100),
             'damage': Timer(300)
         }
 
@@ -76,8 +77,9 @@ class Player(pygame.sprite.Sprite):
             self.direction.y = -self.jump_height
             self.bonus_jumps -= 1
             
-        if key_down[pygame.K_LSHIFT] and self.dash_num > 0:
+        if key_down[pygame.K_LSHIFT] and self.dash_num > 0 and not self.timers['dash_cooldown'].active:
             self.timers['dash'].activate()
+            self.timers['dash_cooldown'].activate()
 
 
     def move(self, dt):

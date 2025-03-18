@@ -3,15 +3,20 @@ from settings import *
 
 
 class Button:
-    def __init__(self, x, y, image, scale):
+    def __init__(self, pos, image, scale):
         width = image.get_width()
         height = image.get_width()
         self.image = pygame.transform.scale(image, (int(width * scale), int(height * scale)))
         self.rect = self.image.get_rect()
-        self.rect.topleft = (x, y)
+        self.rect.center = pos
         
     def draw(self, surface):
-        
+            
+        surface.blit(self.image, (self.rect.x, self.rect.y))
+        return False
+    
+    def get_click(self):
+                
         pos = pygame.mouse.get_pos()
         
         #checking if mouse id on button and the clicked condtion
@@ -19,11 +24,19 @@ class Button:
             if pygame.mouse.get_just_pressed()[0] == 1:
                 print('clicked')
                 return True
-  
             
-        surface.blit(self.image, (self.rect.x, self.rect.y))
-        return False
-
+class slider:
+    def __init__(self, pos, size, initial_val, min, max):
+        self.pos = pos
+        self.size = size
+        
+        self.slider_left_pos = self.pos[0] - (size[0]//2)
+        self.slider_rigt_pos = self.pos[0] + (size[0]//2)
+        self.slider_top_pos = self.pos[1] - (size[1]//2)
+        
+        self.min = min
+        self.max = max
+        self.initial_val = (self.slider_right_pos - self.slider_left_pos) * initial_val # percentage        
 class Menu:
     def __init__(self):
         
@@ -34,8 +47,6 @@ class Menu:
         self.game_paused = False
         self.paused_state = "main"
 
-        #offset to make the buttons be centered on the point chosen
-        self.menu_butttons_offset_5 = 2.5 * 16
         
         #load images
         self.button_images = {'resume': pygame.image.load(r'assets\Buttons\resume.png').convert_alpha(),
@@ -46,11 +57,13 @@ class Menu:
                               }
         
         #button instances
-        self.buttons = [Button((WINDOW_WIDTH / 2) - self.menu_butttons_offset_5, 100, self.button_images['resume'], 5), # scaled so img = 80 x 80
-                         Button((WINDOW_WIDTH / 2) - self.menu_butttons_offset_5, 250, self.button_images['options'], 5),
-                         Button((WINDOW_WIDTH / 2) - self.menu_butttons_offset_5, 400, self.button_images['leaderboard'], 5),
-                         Button((WINDOW_WIDTH / 2) - self.menu_butttons_offset_5, 550, self.button_images['restart'], 5),
-                         Button(WINDOW_WIDTH - (16 * 3), 0, self.button_images['quit'], 3)]  # scaled so img = 80 x 80]
+        self.buttons_main = [Button(((WINDOW_WIDTH / 2), 120), self.button_images['resume'], 5), # scaled so img = 80 x 80
+                         Button(((WINDOW_WIDTH / 2), 270), self.button_images['options'], 5),
+                         Button(((WINDOW_WIDTH / 2), 420), self.button_images['leaderboard'], 5),
+                         Button(((WINDOW_WIDTH / 2), 570), self.button_images['restart'], 5),
+                         Button((WINDOW_WIDTH - 25, 25), self.button_images['quit'], 3)]  # scaled so img = 80 x 80]
+        
+        self.buttons_options = [Button(((WINDOW_WIDTH / 2), 120), self.button_images['resume'], 5)]
         
     def menu_state(self, surface): #should i make menu state a dictionary that then uses teh value in the dict to do things
         keys = pygame.key.get_just_pressed()
@@ -67,24 +80,28 @@ class Menu:
             print(self.paused_state)
             
             ##blur screen and make score stop, make player and enemy stop movement.
-        self.actions(surface)
+        self.actions()
              
             
-    def actions(self, surface):
+    def actions(self):
         if self.game_paused == True:
             if self.paused_state == "main":
-                if self.buttons[0].draw(surface):
+                if self.buttons_main[0].get_click():
                     print('resume')
                     self.game_paused = False
                     print(self.game_paused)
-                elif self.buttons[1].draw(surface):
+                    
+                elif self.buttons_main[1].get_click():
                     self.paused_state = "options"
                     print(self.paused_state)
-                elif self.buttons[2].draw(surface):
+                    
+                elif self.buttons_main[2].get_click():
                     self.paused_state = "leaderboard"
-                elif self.buttons[3].draw(surface):
+                    
+                elif self.buttons_main[3].get_click():
                     pass #"restart"
-                elif self.buttons[4].draw(surface):
+                
+                elif self.buttons_main[4].get_click():
                     pygame.quit()
                     sys.exit()
 
@@ -92,8 +109,8 @@ class Menu:
                 pass
 
             if self.paused_state == "options":
-                if self.buttons[0].draw(surface):
-                    pass
+                if self.buttons_main[0].get_click():
+                    self.game_paused = False
                 #slider for volume//input box
 
 
@@ -103,8 +120,13 @@ class Menu:
         surface.blit(img, (x,y))
         
     def draw(self, surface):
-        for button in self.buttons:
-            button.draw(surface)
+        if self.paused_state == "main":
+            for button in self.buttons_main:
+                button.draw(surface)
+        if self.paused_state == "options":
+            for button in self.buttons_options:
+                button.draw(surface)
+                
 
     def clear(self, surface):
         pass
