@@ -1,6 +1,5 @@
 from settings import *
-
-
+import json
 
 class Button:
     def __init__(self, pos, image, scale):
@@ -25,12 +24,14 @@ class Button:
             if pressed[0] == 1:
                 return True
             
+class InputBox:
+    pass
+            
 class Slider:
     def __init__(self, pos, size, initial_val, min, max):
         self.pos = pos
         self.size = size
         boldness = size[0] * 0.05
-        slider_scale = 1.1
         inner_scale = 2/3
      
         #making the input pos the centre
@@ -43,7 +44,7 @@ class Slider:
         self.initial_val = (self.slider_right_pos - self.slider_left_pos) * initial_val # percentage so 0.1 = 10% along
         
         self.container_rect = pygame.Rect(self.slider_left_pos, self.slider_top_pos, self.size[0], self.size[1])
-        self.slider_rect = pygame.Rect(self.slider_left_pos + self.initial_val - (self.size[0]//2), self.slider_top_pos, boldness, self.size[1])
+        self.slider_rect = pygame.Rect(self.slider_left_pos + self.initial_val, self.slider_top_pos, boldness, self.size[1])
         self.slider_rect_inner = pygame.Rect(0, 0, boldness * inner_scale, self.size[1] * inner_scale)
         self.slider_rect_inner.center = self.slider_rect.center
         
@@ -74,8 +75,12 @@ class Slider:
        #getting value of the slider
        return(slider_value/value_range)*(self.max - self.min) + self.min
    
+
+                       
+   
 class Highscore:
-    pass
+    def __init__(self, user, score):
+        pass
         
 class Menu:
     def __init__(self):
@@ -106,15 +111,37 @@ class Menu:
         
         self.buttons_options = [Button(((WINDOW_WIDTH / 2), 120), self.button_images['resume'], 5),
                                 Button((WINDOW_WIDTH - 25, 25), self.button_images['quit'], 3)]
-        self.sliders = [Slider(((WINDOW_WIDTH / 2), 420), (600, 40), 0.5, 0, 100)]
+        self.sliders = [Slider(((WINDOW_WIDTH / 2), 420), (600, 40), 0.1, 0, 100)]
+                ##maybe add an altering to SCREEN_WIDTH/HEIGHT
         ## top fo vertical, just make taller than wide and change y to be mouse y instead
         ## write to a file with last value ad make that the initial value nect time func
+
+    # def load_settings(self, setting: str): #will be used in level.py
+    #     self.default_settings = {'volume': 0.5,
+    #                              'speed': 1}
+    #     with open("code\config.cfg", "r") as settings:
+    #         data = settings.read()
+    #         if data != '':
+    #             for line in data.split('\n'):
+    #                 split = line.split(" ")
+    #                 if line[0] != '#' and len(split) > 1:
+    #                     if split[0].lower() == setting.lower():
+    #                         return(split[1])
+    #         else:
+    #             print(self.default_settings[setting])
+    #             return(self.default_settings[setting])
+    #float(self.load_settings['volume'])
+                   
+    # def save_settings(self):
+    #     with open("code\config.cfg", "w+") as settings:
+    #         print('open')
+    #         settings.write(self.default_settings)
+        
         
     def menu_state(self, surface): #should i make menu state a dictionary that then uses teh value in the dict to do things
         keys = pygame.key.get_just_pressed()
         if keys[pygame.K_ESCAPE] and self.game_paused == False :
             self.game_paused = True
-            surface = pygame.transform.box_blur(surface, 2)#bluriong every frame then drawing on top every frame
             print(self.game_paused)
         elif keys[pygame.K_ESCAPE] and self.game_paused == True and self.paused_state == "main":
             self.game_paused = False
@@ -162,7 +189,7 @@ class Menu:
                     pygame.quit()
                     sys.exit()   
                 self.sliders[0].get_click()
-                self.volume = self.sliders[0].get_value() #returning volume
+                self.volume = self.sliders[0].get_value()
 
 
                 

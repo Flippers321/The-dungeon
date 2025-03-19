@@ -1,0 +1,21 @@
+"filename", "language", "Properties", "Python", "Markdown", "XML", "TypeScript JSX", "comment", "blank", "total"
+"d:\Code\- Python\- The dungeon\README.md", "Markdown", 0, 0, 1, 0, 0, 0, 0, 1
+"d:\Code\- Python\- The dungeon\code\UI.py", "Python", 0, 141, 0, 0, 0, 12, 51, 204
+"d:\Code\- Python\- The dungeon\code\config.cfg", "Properties", 1, 0, 0, 0, 0, 1, 0, 2
+"d:\Code\- Python\- The dungeon\code\enemies.py", "Python", 0, 8, 0, 0, 0, 0, 2, 10
+"d:\Code\- Python\- The dungeon\code\enemy.py", "Python", 0, 11, 0, 0, 0, 1, 8, 20
+"d:\Code\- Python\- The dungeon\code\entity.py", "Python", 0, 52, 0, 0, 0, 10, 14, 76
+"d:\Code\- Python\- The dungeon\code\functions.py", "Python", 0, 18, 0, 0, 0, 0, 2, 20
+"d:\Code\- Python\- The dungeon\code\groups.py", "Python", 0, 52, 0, 0, 0, 6, 18, 76
+"d:\Code\- Python\- The dungeon\code\level.py", "Python", 0, 66, 0, 0, 0, 6, 12, 84
+"d:\Code\- Python\- The dungeon\code\main.py", "Python", 0, 36, 0, 0, 0, 0, 8, 44
+"d:\Code\- Python\- The dungeon\code\player.py", "Python", 0, 139, 0, 0, 0, 25, 40, 204
+"d:\Code\- Python\- The dungeon\code\settings.py", "Python", 0, 17, 0, 0, 0, 1, 3, 21
+"d:\Code\- Python\- The dungeon\code\sprites.py", "Python", 0, 21, 0, 0, 0, 0, 4, 25
+"d:\Code\- Python\- The dungeon\code\timer.py", "Python", 0, 23, 0, 0, 0, 0, 5, 28
+"d:\Code\- Python\- The dungeon\data\levels\cave-platformer-tileset-16x16.tsx", "TypeScript JSX", 0, 0, 0, 0, 4, 0, 1, 5
+"d:\Code\- Python\- The dungeon\data\levels\level2.tmx", "XML", 0, 0, 0, 651, 0, 0, 1, 652
+"d:\Code\- Python\- The dungeon\data\levels\movign objects.tsx", "TypeScript JSX", 0, 0, 0, 0, 2, 0, 1, 3
+"d:\Code\- Python\- The dungeon\data\levels\moving objects.tsx", "TypeScript JSX", 0, 0, 0, 0, 10, 0, 1, 11
+"d:\Code\- Python\- The dungeon\data\levels\tutorial.tmx", "XML", 0, 0, 0, 317, 0, 0, 0, 317
+"Total", "-", 1, 584, 1, 968, 16, 62, 171, 1803
