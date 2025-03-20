@@ -41,7 +41,10 @@ class Slider:
         
         self.min = min
         self.max = max
-        self.initial_val = (self.slider_right_pos - self.slider_left_pos) * initial_val # percentage so 0.1 = 10% along
+        print('1',initial_val)
+        self.initial_val =(size[0] * (initial_val / 100)) - 16
+        print('3', self.initial_val)
+
         
         self.container_rect = pygame.Rect(self.slider_left_pos, self.slider_top_pos, self.size[0], self.size[1])
         self.slider_rect = pygame.Rect(self.slider_left_pos + self.initial_val, self.slider_top_pos, boldness, self.size[1])
@@ -91,8 +94,8 @@ class Menu:
         #menu states
         self.game_paused = False
         self.paused_state = "main"
-        self.volume = 0 ## read file into here line 111
-
+        self.default_settings = {'volume': 0.5}
+        self.new_setting = {'mew_volume': 0}
         
         #load images
         self.button_images = {'resume': pygame.image.load(r'assets\Buttons\resume.png').convert_alpha(),
@@ -111,31 +114,28 @@ class Menu:
         
         self.buttons_options = [Button(((WINDOW_WIDTH / 2), 120), self.button_images['resume'], 5),
                                 Button((WINDOW_WIDTH - 25, 25), self.button_images['quit'], 3)]
-        self.sliders = [Slider(((WINDOW_WIDTH / 2), 420), (600, 40), 0.1, 0, 100)]
+        self.sliders = [Slider(((WINDOW_WIDTH / 2), 420), (600, 40), self.load_settings('volume'), 0, 100)]
                 ##maybe add an altering to SCREEN_WIDTH/HEIGHT
         ## top fo vertical, just make taller than wide and change y to be mouse y instead
         ## write to a file with last value ad make that the initial value nect time func
 
-    # def load_settings(self, setting: str): #will be used in level.py
-    #     self.default_settings = {'volume': 0.5,
-    #                              'speed': 1}
-    #     with open("code\config.cfg", "r") as settings:
-    #         data = settings.read()
-    #         if data != '':
-    #             for line in data.split('\n'):
-    #                 split = line.split(" ")
-    #                 if line[0] != '#' and len(split) > 1:
-    #                     if split[0].lower() == setting.lower():
-    #                         return(split[1])
-    #         else:
-    #             print(self.default_settings[setting])
-    #             return(self.default_settings[setting])
-    #float(self.load_settings['volume'])
+
+    def load_settings(self, setting): #will be used in level.py
+          
+         with open("code\config.json", "r") as c:
+             data = json.load(c)
+             #if data == '':
+             #    self(self.default_settings)
+             value = data.get(setting)
+             print('val', value)
+             return(value)
                    
-    # def save_settings(self):
-    #     with open("code\config.cfg", "w+") as settings:
-    #         print('open')
-    #         settings.write(self.default_settings)
+    def save_settings(self):
+         with open("code\config.json", "w") as c:
+             value = c.write(json.dumps({'volume': round(self.sliders[0].get_value())}))
+             print("SAVING", value)
+             print('save', json.dumps({'volume': self.sliders[0].get_value()}))
+             
         
         
     def menu_state(self, surface): #should i make menu state a dictionary that then uses teh value in the dict to do things
@@ -157,6 +157,7 @@ class Menu:
             
     def actions(self):
         if self.game_paused == True:
+            print(self.sliders[0].get_value())
             if self.paused_state == "main":
                 if self.buttons_main[0].get_click():
                     print('resume')
@@ -166,6 +167,7 @@ class Menu:
                 elif self.buttons_main[1].get_click():
                     self.paused_state = "options"
                     print(self.paused_state)
+               
                     
                 elif self.buttons_main[2].get_click():
                     self.paused_state = "leaderboard"
@@ -189,7 +191,9 @@ class Menu:
                     pygame.quit()
                     sys.exit()   
                 self.sliders[0].get_click()
+                self.save_settings()
                 self.volume = self.sliders[0].get_value()
+                
 
 
                 
