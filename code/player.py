@@ -4,7 +4,6 @@ from os.path import join
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos,  groups, collision_sprites, damage_sprites, enemy_sprites, health, frames):
-        #setup
         super().__init__(groups)
         self.z = Z_LAYERS['entity']
 
@@ -101,7 +100,6 @@ class Player(pygame.sprite.Sprite):
 
         self.rect.x += self.direction.x * dt ## make it self.drag? do one for both x and
         self.collision('horizontal')  
-        
         #veritcal
         if self.jump:
             if self.on_surface['floor']:

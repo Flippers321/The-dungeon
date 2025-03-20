@@ -24,7 +24,7 @@ class Game:
         }
         
     def run(self):
-        while True:
+        while True:  
             dt = self.clock.tick(FPS) / 1000 #getting the time between frames in seconds
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

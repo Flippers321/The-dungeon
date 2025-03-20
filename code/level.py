@@ -49,8 +49,8 @@ class Level():
                 self.enemy = Slime(
                     pos = (obj.x, obj.y),
                     groups = self.all_sprites,
-                    collision_sprites = self.enemy_sprites, 
-                    health = 1,
+                    collision_sprites = self.collision_sprites, 
+                    damage_sprites = self.damage_sprites,
                     frames = obj_frames['enemy'])
 
     def check_win(self):
