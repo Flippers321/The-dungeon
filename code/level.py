@@ -8,6 +8,7 @@ from UI import Menu
 class Level():
     def __init__(self, tmx_map, obj_frames):
         self.display_surface = pygame.display.get_surface()
+        pygame.mixer.init()
         
         #groups
         self.all_sprites = CameraGroup()
@@ -15,10 +16,15 @@ class Level():
         self.damage_sprites = pygame.sprite.Group()
         self.enemy_sprites = pygame.sprite.Group()
         
-        self.setup(tmx_map, obj_frames)
-        
         self.menu = Menu()
-    
+
+        #audio
+        self.audio = {'jump': pygame.mixer.Sound('assets\MP3\Modern9.mp3'),
+                      'dash': pygame.mixer.Sound('assets\MP3\Retro10.mp3'),
+                      'kill': pygame.mixer.Sound('assets\MP3\Retro7.mp3')}
+        #self.audio_volume = round(self.menu.volume)
+
+        self.setup(tmx_map, obj_frames)    
     #getting pos of values stored in layer
     def setup(self, tmx_map, obj_frames):
         #tiles
@@ -31,6 +37,8 @@ class Level():
                 if layer == 'spikes': groups.append(self.damage_sprites)
                 z = Z_LAYERS['climbing chains']
                 Sprite((x * TILE_SIZE, y * TILE_SIZE), surf, groups, z)
+
+        #for enemy in Slime : groups.append(self.enemy_sprites)
         
         #spawn objects
         for obj in tmx_map.get_layer_by_name('spawn'):
@@ -44,7 +52,10 @@ class Level():
                     damage_sprites = self.damage_sprites,
                     enemy_sprites = self.enemy_sprites,
                     health = 3,
-                    frames = obj_frames['player'])
+                    frames = obj_frames['player'],
+                    audio = self.audio)
+                    #volume = self.audio_volume)
+
             if obj.name == 'enemy':
                 self.enemy = Slime(
                     pos = (obj.x, obj.y),
@@ -64,6 +75,7 @@ class Level():
         if self.menu.game_paused == True:
             self.menu.draw(self.display_surface)
             if self.menu.paused_state == 'options':
+               print(self.menu.volume)
                self.menu.draw_text(f'Volume: {round(self.menu.volume)}', (100, 100, 100), (WINDOW_WIDTH / 2) - 16, 450, self.display_surface)
 
         else:

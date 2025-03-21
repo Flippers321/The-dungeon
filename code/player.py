@@ -3,7 +3,7 @@ from timer import Timer
 from os.path import join 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos,  groups, collision_sprites, damage_sprites, enemy_sprites, health, frames):
+    def __init__(self, pos,  groups, collision_sprites, damage_sprites, enemy_sprites, health, frames, audio):#volume
         super().__init__(groups)
         self.z = Z_LAYERS['entity']
 
@@ -46,6 +46,12 @@ class Player(pygame.sprite.Sprite):
             'damage': Timer(300)
         }
 
+        #audio
+        self.jump_sound = audio['jump']
+        self.dash_sound = audio['dash']
+        self.kill_sound = audio['kill']
+        #self.volume = volume
+
     def input(self):
 
         keys = pygame.key.get_pressed()
@@ -87,6 +93,7 @@ class Player(pygame.sprite.Sprite):
         self.direction.x += self.input_vector.x * self.speed
 
         if self.timers['dash'].active:
+            self.dash_sound.play()
             self.dash_num -= 1
             self.direction.x = self.direction.x * self.speed * self.dashx_multi * dt
             self.direction.y = self.direction.y * self.speed * self.dashy_multi * dt
@@ -102,6 +109,7 @@ class Player(pygame.sprite.Sprite):
         self.collision('horizontal')  
         #veritcal
         if self.jump:
+            self.jump_sound.play()
             if self.on_surface['floor']:
                 self.direction.y = -self.jump_height
             elif self.on_surface['left']:
