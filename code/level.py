@@ -19,9 +19,11 @@ class Level():
         self.menu = Menu()
 
         #audio
-        self.audio = {'jump': pygame.mixer.Sound('assets\MP3\Modern9.mp3'),
+        self.audio = {'jump': pygame.mixer.Sound('assets\MP3\sound1.mp3'),
                       'dash': pygame.mixer.Sound('assets\MP3\Retro10.mp3'),
-                      'kill': pygame.mixer.Sound('assets\MP3\Retro7.mp3')}
+                      'kill': pygame.mixer.Sound('assets\MP3\Retro7.mp3'),
+                      'death': pygame.mixer.Sound('assets\MP3\death.mp3'),
+                      'dash': pygame.mixer.Sound('assets\MP3\dash.mp3')}
         #self.audio_volume = round(self.menu.volume)
 
         self.setup(tmx_map, obj_frames)    
@@ -44,6 +46,7 @@ class Level():
         for obj in tmx_map.get_layer_by_name('spawn'):
             if obj.name == 'end':
                 self.player.end_pos = pygame.Rect(obj.x, obj.y, obj.width, obj.height)
+                
             if obj.name == 'start':
                 self.player = Player(
                     pos = (obj.x, obj.y),
@@ -54,16 +57,32 @@ class Level():
                     health = 3,
                     frames = obj_frames['player'],
                     audio = self.audio)
-                    #volume = self.audio_volume)
-
+                    #volume = self.audio_volume)       
+                             
             if obj.name == 'enemy':
                 self.enemy = Slime(
                     pos = (obj.x, obj.y),
-                    groups = self.all_sprites,
+                    groups = [self.all_sprites, self.enemy_sprites],
                     collision_sprites = self.collision_sprites, 
                     damage_sprites = self.damage_sprites,
-                    frames = obj_frames['enemy'])
+                    player_sprite = self.player,
+                    frames = obj_frames['enemy'],)
+                    #player_pos = self.player.rect)
+                    
+                groups.append(self.enemy_sprites)                
+                
+    def enemy_removal(self):
+        if self.enemy.death() == True:
+            self.enemy.rect.x = 260
+            self.enemy.rect.y = 420
 
+
+                    
+    #def check_kill(self):
+            
+    def score(self):
+        pass
+        #if player movement start score, only increase score if paused = False
     def check_win(self):
         if self.player.rect.colliderect(self.player.end_pos):
             print('win')
@@ -81,13 +100,12 @@ class Level():
         else:
             self.menu.draw_text('Press ESC to pause', (100, 100, 100), 20, 20, self.display_surface)
      
-    def score(self):
-        pass
-        #if player movement start score, only increase score if paused = False
+
            
     def run(self, dt):
         self.display_surface.fill(BACKGROUND_COLOUR)
         self.all_sprites.update(dt)
+        self.enemy_removal()
         self.check_win()
         self.all_sprites.draw(self.player)
         self.draw_menu()

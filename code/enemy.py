@@ -3,12 +3,13 @@ from timer import Timer
 from player import Player
 
 class Slime(pygame.sprite.Sprite):
-    def __init__(self, pos, groups, collision_sprites, damage_sprites, frames):
+    def __init__(self, pos, groups, collision_sprites, damage_sprites, player_sprite, frames):
         super().__init__(groups)
         self.z = Z_LAYERS['entity']
 
         self.frames, self.frame_index = frames, 0
         self.image = self.frames['idle'][self.frame_index]
+        self.player = player_sprite
 
         self.jumps = 1
 
@@ -31,6 +32,7 @@ class Slime(pygame.sprite.Sprite):
         self.collision_sprites = collision_sprites
         self.damage_sprites = damage_sprites
         self.on_surface = {'floor': False, 'left': False, 'right': False, 'roof': False}
+        
         
         
     def detection(self):
@@ -124,12 +126,12 @@ class Slime(pygame.sprite.Sprite):
                     self.death()
                     
     def death(self):
-        pass ## clear enemy
+        if self.player.check_enemy_hit():
+            return True
 
     def update(self, dt):
         self.old_rect = self.rect.copy()
         #update drag
         self.movement(dt)
-        #self.detection()
-        #self.dash_timer(dt)
         self.check_contacts()
+        self.death()

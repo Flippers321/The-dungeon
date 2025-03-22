@@ -8,7 +8,8 @@ class Player(pygame.sprite.Sprite):
         self.z = Z_LAYERS['entity']
 
         self.frames, self.frame_index = frames, 0
-        self.image = self.frames['idle'][self.frame_index]
+        self.state, self.facing_right = 'idle', True
+        self.image = self.frames[self.state][self.frame_index]
         
         #image
         self.respawn = pos
@@ -37,6 +38,7 @@ class Player(pygame.sprite.Sprite):
         self.damage_sprites = damage_sprites
         self.enemy_sprites = enemy_sprites
         self.on_surface = {'floor': False, 'left': False, 'right': False, 'roof': False}
+        self.on_enemy = False
 
         #timer
         self.timers = {
@@ -50,6 +52,8 @@ class Player(pygame.sprite.Sprite):
         self.jump_sound = audio['jump']
         self.dash_sound = audio['dash']
         self.kill_sound = audio['kill']
+        self.death_sound = audio['death']
+        self.dah_sound = audio['dash']
         #self.volume = volume
 
     def input(self):
@@ -66,8 +70,10 @@ class Player(pygame.sprite.Sprite):
         if not self.timers['wall jump'].active:
             if keys[pygame.K_a]:
                 self.input_vector.x += -1 #move left
+                self.facing_right = False
             if keys[pygame.K_d]:
                 self.input_vector.x += 1 #move right
+                self.facing_right = True
             #if opposite keys (a , d) are simultaniously pressed, vector movement = 0
             
 
@@ -83,6 +89,7 @@ class Player(pygame.sprite.Sprite):
             
         if key_down[pygame.K_LSHIFT] and self.dash_num > 0:
             self.timers['dash'].activate()
+            self.dash_sound.play()
             # add a way to create a cooldown, maybe with another timer
 
 
@@ -129,7 +136,11 @@ class Player(pygame.sprite.Sprite):
         self.rect.y += self.direction.y
         self.collision('vert')
         
+    def animate(self, dt):
         
+        self.frame_index += ANIMATION_SPEED * dt
+        self.image = self.frames[self.state][int(self.frame_index % len(self.frames[self.state]))]
+        self.image = self.image if self.facing_right else pygame.transform.flip(self.image, True, False)
 
     def check_contacts(self):
         floor_rect = pygame.Rect(self.rect.bottomleft,(self.rect.width, 1))
@@ -179,16 +190,26 @@ class Player(pygame.sprite.Sprite):
                 print(self.health)
                 if self.health <= 0:
                     self.death()
-
-        for sprite in self.enemy_sprites:
-            if sprite.rect.colliderect(self.rect):
-                self.death()
-                self.timers['damage'].activate()
-                print('death to enemy')
                     
+    def check_enemy_hit(self):
+        for sprite in self.enemy_sprites:
+            if sprite.rect.colliderect(self.rect) and not self.timers['damage'].active:
+                self.health -= 1
+                self.timers['damage'].activate()
+                print(self.health)
+                print('enemies hurt')
+                if self.health <= 0:
+                    self.death()
+     
+            if sprite.rect.colliderect(self.rect):
+                if self.rect.bottom >= sprite.rect.top and int(self.old_rect.bottom) <= int(sprite.old_rect.top):
+                    print('enemy felled')
+                    self.kill_sound.play()
+                    return True                     
     def death(self):
         self.rect = self.image.get_frect(topleft = self.respawn)
         self.health = self.max_health
+        self.death_sound.play()
 
 
     def update_timers(self):
@@ -204,6 +225,8 @@ class Player(pygame.sprite.Sprite):
             self.bonus_jumps = 1
             self.dash_num = 1
         self.move(dt)
+        self.animate(dt)
         #self.dash_timer(dt)
         self.check_contacts()
+        self.check_enemy_hit()
         #print(self.timers['wall jump'].active)
