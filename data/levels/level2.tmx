@@ -635,7 +635,7 @@
   <object id="22" name="enemy" x="1397.67" y="645"/>
   <object id="23" name="enemy" x="1203" y="1103"/>
   <object id="77" name="enemy" x="15169.33" y="6924.667"/>
-  <object id="269" name="end" x="2846" y="440"/>
+  <object id="269" name="end" x="2800" y="440"  width="32" height="32"/>
  </objectgroup>
  <objectgroup id="3" name="Moving_objects">
   <object id="16" gid="100" x="448" y="1280" width="696" height="16"/>

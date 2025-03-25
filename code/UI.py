@@ -95,7 +95,7 @@ class Menu:
         self.game_paused = False
         self.paused_state = "main"
         self.default_settings = {'volume': 0.5}
-        self.new_setting = {'mew_volume': 0}
+        self.new_setting = {'new_volume': 0}
         
         #load images
         self.button_images = {'resume': pygame.image.load(r'assets\Buttons\resume.png').convert_alpha(),
@@ -115,6 +115,11 @@ class Menu:
         self.buttons_options = [Button(((WINDOW_WIDTH / 2), 120), self.button_images['resume'], 5),
                                 Button((WINDOW_WIDTH - 25, 25), self.button_images['quit'], 3)]
         self.sliders = [Slider(((WINDOW_WIDTH / 2), 420), (600, 40), self.load_settings('volume'), 0, 100)]
+        
+        self.buttons_leaderboard = [Button(((WINDOW_WIDTH / 2), 120), self.button_images['resume'], 5),
+                                    Button(((WINDOW_WIDTH / 2), 120), self.button_images['quit'], 5),
+                                    Button(((WINDOW_WIDTH / 2), 570), self.button_images['restart'], 5),]
+                                    
                 ##maybe add an altering to SCREEN_WIDTH/HEIGHT
         ## top fo vertical, just make taller than wide and change y to be mouse y instead
         ## write to a file with last value ad make that the initial value nect time func
@@ -194,11 +199,24 @@ class Menu:
                 self.save_settings()
                 self.volume = self.sliders[0].get_value()
                 
+            if self.paused_state == "leaderboard":
+                if self.buttons_leaderboard[0].get_click():
+                    self.paused_state = "main"
+                if self.buttons_leaderboard[1].get_click():
+                    pygame.quit()
+                    sys.exit()   
+                if self.buttons_leaderboard[2].get_click():
+                    pass #restart                
+            if self.paused_state == "gamewin":
+                if self.buttons_leaderboard[1].get_click():
+                    pygame.quit()
+                    sys.exit()
+                
 
 
                 
     def draw_text(self, text, colour, x, y, surface):
-        text_offset = (len(text)*8 //2)
+        text_offset = (len(text)*8 //2) # centering words when more characters are added
         img = self.font.render(text, True, colour)
         surface.blit(img, (x - text_offset,y))
         
@@ -213,6 +231,9 @@ class Menu:
                 button.draw(surface)
             for slider in self.sliders:
                 slider.draw(surface)
+        if self.paused_state == 'leaderboard':
+            for button in self.buttons_main: #sharing a button with 'main'
+                button.draw(surface)
                 
             
             

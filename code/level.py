@@ -6,7 +6,7 @@ from groups import CameraGroup
 from UI import Menu
 
 class Level():
-    def __init__(self, tmx_map, obj_frames):
+    def __init__(self, tmx_map, obj_frames, score):
         self.display_surface = pygame.display.get_surface()
         pygame.mixer.init()
         
@@ -16,8 +16,9 @@ class Level():
         self.damage_sprites = pygame.sprite.Group()
         self.enemy_sprites = pygame.sprite.Group()
         
+        
+        self.score = score
         self.menu = Menu()
-
         #audio
         self.audio = {'jump': pygame.mixer.Sound('assets\MP3\sound1.mp3'),
                       'dash': pygame.mixer.Sound('assets\MP3\Retro10.mp3'),
@@ -57,7 +58,7 @@ class Level():
                     health = 3,
                     frames = obj_frames['player'],
                     audio = self.audio)
-                    #volume = self.audio_volume)       
+                    #volume = self.audio_volume)     
                              
             if obj.name == 'enemy':
                 self.enemy = Slime(
@@ -75,13 +76,13 @@ class Level():
         if self.enemy.death() == True:
             self.enemy.rect.x = 260
             self.enemy.rect.y = 420
+            self.score -= 50
 
-
-                    
-    #def check_kill(self):
+    def update_score(self):
+        self.score += 1
+        return(self.score)
             
-    def score(self):
-        pass
+
         #if player movement start score, only increase score if paused = False
     def check_win(self):
         if self.player.rect.colliderect(self.player.end_pos):
@@ -96,9 +97,19 @@ class Level():
             if self.menu.paused_state == 'options':
                print(self.menu.volume)
                self.menu.draw_text(f'Volume: {round(self.menu.volume)}', (100, 100, 100), (WINDOW_WIDTH / 2) - 16, 450, self.display_surface)
+               
+            if self.menu.paused_state == 'leaderboard':
+                self.menu.draw_text('highscores', (100, 100, 100), (WINDOW_WIDTH / 2) - 16, 450, self.display_surface)
+                # self.menu.draw_leaderboard(self.display_surface)
+                # self.menu.draw_text('Press ENTER to return', (100, 100, 100), 100, WINDOW_HEIGHT - 40, self.display_surface)
+                # self.menu.leaderboard_state()
+                # self.menu.leaderboard_actions()
 
         else:
-            self.menu.draw_text('Press ESC to pause', (100, 100, 100), 20, 20, self.display_surface)
+            self.menu.draw_text('Press ESC to Pause', (100, 100, 100), 100, 20, self.display_surface)
+            self.menu.draw_text('Press LSHIFT to Dash', (100, 100, 100), 100, 50, self.display_surface)
+            self.menu.draw_text(f'score: {round(self.score)}', (100, 100, 100), 80, WINDOW_HEIGHT - 40, self.display_surface)
+            self.menu.draw_text(f'Lives: {round(self.player.health)}', (100, 100, 100), 200, WINDOW_HEIGHT - 40, self.display_surface)
      
 
            
@@ -107,6 +118,7 @@ class Level():
         self.all_sprites.update(dt)
         self.enemy_removal()
         self.check_win()
+        self.update_score()
         self.all_sprites.draw(self.player)
         self.draw_menu()
         self.menu.menu_state(self.display_surface)

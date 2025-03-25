@@ -55,6 +55,8 @@ class Player(pygame.sprite.Sprite):
         self.death_sound = audio['death']
         self.dah_sound = audio['dash']
         #self.volume = volume
+        
+        self.score = 0
 
     def input(self):
 
@@ -202,10 +204,12 @@ class Player(pygame.sprite.Sprite):
                     self.death()
      
             if sprite.rect.colliderect(self.rect):
-                if self.rect.bottom >= sprite.rect.top and int(self.old_rect.bottom) <= int(sprite.old_rect.top):
+                if self.rect.bottom >= (sprite.rect.top - 1) and int(self.old_rect.bottom) <= int(sprite.old_rect.top):
                     print('enemy felled')
                     self.kill_sound.play()
-                    return True                     
+                    return True                
+                
+
     def death(self):
         self.rect = self.image.get_frect(topleft = self.respawn)
         self.health = self.max_health
