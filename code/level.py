@@ -1,5 +1,5 @@
 from settings import *
-from sprites import Sprite
+from sprites import Sprite, MovingSprite
 from player import Player
 from enemy import Slime
 from groups import CameraGroup
@@ -24,9 +24,10 @@ class Level():
                       'dash': pygame.mixer.Sound('assets\MP3\Retro10.mp3'),
                       'kill': pygame.mixer.Sound('assets\MP3\Retro7.mp3'),
                       'death': pygame.mixer.Sound('assets\MP3\death.mp3'),
-                      'dash': pygame.mixer.Sound('assets\MP3\dash.mp3')}
+                      'dash': pygame.mixer.Sound('assets\MP3\dash.mp3'),
+                      'hit': pygame.mixer.Sound('assets\MP3\hit.mp3')}
         #self.audio_volume = round(self.menu.volume)
-
+        self.platform_speed = 100
         self.setup(tmx_map, obj_frames)    
     #getting pos of values stored in layer
     def setup(self, tmx_map, obj_frames):
@@ -57,8 +58,7 @@ class Level():
                     enemy_sprites = self.enemy_sprites,
                     health = 3,
                     frames = obj_frames['player'],
-                    audio = self.audio)
-                    #volume = self.audio_volume)     
+                    audio = self.audio)    
                              
             if obj.name == 'enemy':
                 self.enemy = Slime(
@@ -70,13 +70,30 @@ class Level():
                     frames = obj_frames['enemy'],)
                     #player_pos = self.player.rect)
                     
-                groups.append(self.enemy_sprites)                
+                groups.append(self.enemy_sprites)      
                 
+                
+        for obj in tmx_map.get_layer_by_name('Moving_objects'):
+            if obj.name == 'moving platform up':
+                move_direction = 'y'
+                start_pos = (obj.x, obj.y + obj.height/2)
+                end_pos = (obj.x + obj.width/2, obj.y + obj.height/2)
+                print('here')
+                MovingSprite(self.all_sprites, start_pos, end_pos, move_direction, self.platform_speed)
+            if obj.name == 'moving wall left':
+                move_direction = 'x'
+                start_pos = (obj.x - 32, obj.y + obj.height/2)
+                end_pos = (obj.x + obj.width, obj.y + obj.height/2)
+                MovingSprite((self.all_sprites, self.collision_sprites), start_pos, end_pos, move_direction, self.platform_speed)   
     def enemy_removal(self):
         if self.enemy.death() == True:
             self.enemy.rect.x = 260
             self.enemy.rect.y = 420
             self.score -= 50
+            
+    def check_restart(self):
+        if self.menu.paused_state == 'restart':
+            print('here')
 
     def update_score(self):
         self.score += 1
@@ -86,7 +103,6 @@ class Level():
         #if player movement start score, only increase score if paused = False
     def check_win(self):
         if self.player.rect.colliderect(self.player.end_pos):
-            print('win')
             return True
             
             self.rect = self.image.get_frect(topleft = self.respawn)
@@ -95,11 +111,11 @@ class Level():
         if self.menu.game_paused == True:
             self.menu.draw(self.display_surface)
             if self.menu.paused_state == 'options':
-               print(self.menu.volume)
+               #print(self.menu.volume)
                self.menu.draw_text(f'Volume: {round(self.menu.volume)}', (100, 100, 100), (WINDOW_WIDTH / 2) - 16, 450, self.display_surface)
                
             if self.menu.paused_state == 'leaderboard':
-                self.menu.draw_text('highscores', (100, 100, 100), (WINDOW_WIDTH / 2) - 16, 450, self.display_surface)
+                self.menu.draw_text('highscores', (100, 100, 100), 50, 250, self.display_surface)
                 # self.menu.draw_leaderboard(self.display_surface)
                 # self.menu.draw_text('Press ENTER to return', (100, 100, 100), 100, WINDOW_HEIGHT - 40, self.display_surface)
                 # self.menu.leaderboard_state()
@@ -117,6 +133,7 @@ class Level():
         self.display_surface.fill(BACKGROUND_COLOUR)
         self.all_sprites.update(dt)
         self.enemy_removal()
+        self.check_restart()
         self.check_win()
         self.update_score()
         self.all_sprites.draw(self.player)

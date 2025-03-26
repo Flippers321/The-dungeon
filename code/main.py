@@ -38,14 +38,16 @@ class Game:
             #print(self.current_score)
 
             self.current_stage.run(dt)
+            
+                
             if self.current_stage.check_win():
                 print('win')
-                if self.current_stage == 0:
+                if self.level_count == 0:
                     self.level_count += 1
                     self.current_stage = Level(self.tmx_maps[self.level_count], self.obj_frames, self.current_score)
                 else:
-                    self.level_count +=0
-                    
+                    self.level_count += 0
+                    self.current_stage = self.current_stage    
 
             
             pygame.display.update()

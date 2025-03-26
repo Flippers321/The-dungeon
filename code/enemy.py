@@ -43,11 +43,12 @@ class Slime(pygame.sprite.Sprite):
         #horizontal pathing
         if self.player.rect.x > self.rect.x:
             print('pleyer is on the right')
-            self.detect_vector.x += 1
+            #self.detect_vector.x += 1
         if self.player.rect.x < self.rect.x:
-            self.detect_vector.x += -1
+            print('player is on the left')
+            #self.detect_vector.x += -1
             
-        if self.player.rect.rect.y > self.rect.y:
+        if self.player.rect.y > self.rect.y:
             self.jump = True
         else:
             self.jump = False
@@ -133,7 +134,7 @@ class Slime(pygame.sprite.Sprite):
     def update(self, dt):
         self.old_rect = self.rect.copy()
         #update drag
-        self.detection()
+        #self.detection()
         self.movement(dt)
         self.check_contacts()
         self.death()

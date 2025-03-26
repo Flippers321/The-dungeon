@@ -117,8 +117,7 @@ class Menu:
         self.sliders = [Slider(((WINDOW_WIDTH / 2), 420), (600, 40), self.load_settings('volume'), 0, 100)]
         
         self.buttons_leaderboard = [Button(((WINDOW_WIDTH / 2), 120), self.button_images['resume'], 5),
-                                    Button(((WINDOW_WIDTH / 2), 120), self.button_images['quit'], 5),
-                                    Button(((WINDOW_WIDTH / 2), 570), self.button_images['restart'], 5),]
+                                    Button(((WINDOW_WIDTH - 25), 25), self.button_images['quit'], 3)]
                                     
                 ##maybe add an altering to SCREEN_WIDTH/HEIGHT
         ## top fo vertical, just make taller than wide and change y to be mouse y instead
@@ -178,7 +177,8 @@ class Menu:
                     self.paused_state = "leaderboard"
                     
                 elif self.buttons_main[3].get_click():
-                    pass #"restart"
+                    self.game_paused = False
+                    #self.paused_state = "main"
                 
                 elif self.buttons_main[4].get_click():
                     pygame.quit()
@@ -204,9 +204,7 @@ class Menu:
                     self.paused_state = "main"
                 if self.buttons_leaderboard[1].get_click():
                     pygame.quit()
-                    sys.exit()   
-                if self.buttons_leaderboard[2].get_click():
-                    pass #restart                
+                    sys.exit()                
             if self.paused_state == "gamewin":
                 if self.buttons_leaderboard[1].get_click():
                     pygame.quit()
@@ -232,7 +230,7 @@ class Menu:
             for slider in self.sliders:
                 slider.draw(surface)
         if self.paused_state == 'leaderboard':
-            for button in self.buttons_main: #sharing a button with 'main'
+            for button in self.buttons_leaderboard: #sharing a button with 'main'
                 button.draw(surface)
                 
             
