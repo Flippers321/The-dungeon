@@ -20,8 +20,9 @@ class Slime(pygame.sprite.Sprite):
         self.direction = vector() 
         self.speed = 50
         self.drag_coefficient = 0.30
-        self.gravity = 13
+        self.gravity = 18
         self.jump = False
+        self.jumps = 1
         self.jump_height = 5
         self.detect_vector = vector()
         self.health = 1
@@ -33,29 +34,28 @@ class Slime(pygame.sprite.Sprite):
         self.damage_sprites = damage_sprites
         self.on_surface = {'floor': False, 'left': False, 'right': False, 'roof': False}
         
-        
-        
     def detection(self):
         #player detection
-        self.detect_vector = (0, 0)
+        self.detect_vector = [0, 0]
         print(self.rect.x)
         print(self.player.rect.x)
         #horizontal pathing
         if self.player.rect.x > self.rect.x:
             print('pleyer is on the right')
-            #self.detect_vector.x += 1
+            self.detect_vector[0] += 1
         if self.player.rect.x < self.rect.x:
             print('player is on the left')
-            #self.detect_vector.x += -1
+            self.detect_vector[0] += -1
             
-        if self.player.rect.y > self.rect.y:
+            #+16 so the slime doesnt keep jumping even if player is on the same tile hieght
+        if (self.player.rect.y +16) < self.rect.y and self.on_surface['floor']: 
             self.jump = True
         else:
             self.jump = False
             
     def movement(self, dt):
         
-        self.direction.x = self.detect_vector.x *  self.speed
+        self.direction.x = self.detect_vector[0] *  self.speed
         self.direction.x *= 0.8
         self.rect.x += self.direction.x * dt
         self.collision('horizontal')
@@ -73,6 +73,8 @@ class Slime(pygame.sprite.Sprite):
             self.direction.y = 0
 
         self.direction.y += self.gravity * dt
+        
+        ###is this needed (makes wall slides? maybe goo for falling down)
         if self.on_surface['left'] or self.on_surface['right']:
             if self.direction.y > 1:
                 self.direction.y = 1
@@ -134,7 +136,7 @@ class Slime(pygame.sprite.Sprite):
     def update(self, dt):
         self.old_rect = self.rect.copy()
         #update drag
-        #self.detection()
+        self.detection()
         self.movement(dt)
         self.check_contacts()
         self.death()

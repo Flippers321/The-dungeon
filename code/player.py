@@ -46,7 +46,6 @@ class Player(pygame.sprite.Sprite):
         #timer
         self.timers = {
             'wall jump': Timer(400),
-            'wall slide': Timer(250),
             'dash': Timer(5),
             'damage': Timer(300)
         }
@@ -127,6 +126,7 @@ class Player(pygame.sprite.Sprite):
 
         self.rect.x += self.direction.x * dt ## make it self.drag? do one for both x and
         self.collision('horizontal')  
+        
         #veritcal
         if self.jump:
             self.jump_sound.play()
@@ -153,8 +153,7 @@ class Player(pygame.sprite.Sprite):
         
     def move_platform(self, dt):
         if self.platform:
-            print('patform')
-            self.rect.x += self.platform.direction * self.platform.speed * dt
+            self.rect.x += self.platform.direction.x * self.platform.speed * dt
     def animate(self, dt):
         
         self.frame_index += ANIMATION_SPEED * dt
@@ -173,7 +172,11 @@ class Player(pygame.sprite.Sprite):
 
         #pygame.draw.rect(self.display_surface, 'yellow', floor_rect)
         #pygame.draw.rect(self.display_surface, 'yellow', roof_rect)
-
+        self.platform = None
+        for sprite in [sprite for sprite in self.collision_sprites.sprites() if hasattr(sprite, 'moving')]:
+            if sprite.rect.colliderect(floor_rect):
+                print('player , on platform')
+                self.platform = sprite
 
         self.on_surface['floor'] = True if floor_rect.collidelist(collide_rects) >= 0 else False
         self.on_surface['roof'] = True if roof_rect.collidelist(collide_rects) >= 0 else False
@@ -181,11 +184,7 @@ class Player(pygame.sprite.Sprite):
         self.on_surface['right'] = True if right_rect.collidelist(collide_rects) >= 0 else False
 
         #getting if the player is on a moving platform
-        self.platform = None
-        for sprite in [sprite for sprite in self.collision_sprites.sprites() if hasattr(sprite, 'moving')]:
-            if sprite.rect.colliderect(floor_rect):
-                print('player , on platform')
-                self.platform = sprite
+
 
     def collision(self, axis):
         for sprite in self.collision_sprites:

@@ -74,12 +74,12 @@ class Level():
                 
                 
         for obj in tmx_map.get_layer_by_name('Moving_objects'):
-            if obj.name == 'moving platform up':
-                move_direction = 'y'
-                start_pos = (obj.x, obj.y + obj.height/2)
-                end_pos = (obj.x + obj.width/2, obj.y + obj.height/2)
-                print('here')
-                MovingSprite(self.all_sprites, start_pos, end_pos, move_direction, self.platform_speed)
+            # if obj.name == 'moving platform up':
+            #     move_direction = 'y'
+            #     start_pos = (obj.x, obj.y + obj.height/2)
+            #     end_pos = (obj.x + obj.width/2, obj.y + obj.height/2)
+            #     print('here')
+            #     MovingSprite(self.all_sprites, start_pos, end_pos, move_direction, self.platform_speed)
             if obj.name == 'moving wall left':
                 move_direction = 'x'
                 start_pos = (obj.x - 32, obj.y + obj.height/2)
