@@ -56,7 +56,7 @@ class Level():
                     collision_sprites = self.collision_sprites,
                     damage_sprites = self.damage_sprites,
                     enemy_sprites = self.enemy_sprites,
-                    health = 3,
+                    health = 10,
                     frames = obj_frames['player'],
                     audio = self.audio)    
                              
@@ -113,6 +113,7 @@ class Level():
                 # self.menu.draw_text('Press ENTER to return', (100, 100, 100), 100, WINDOW_HEIGHT - 40, self.display_surface)
                 # self.menu.leaderboard_state()
                 # self.menu.leaderboard_actions()
+            self.menu.draw_text(f'score: {round(self.score)}', (100, 100, 100), 80, WINDOW_HEIGHT - 40, self.display_surface)
 
         else:
             self.menu.draw_text('Press ESC to Pause', (100, 100, 100), 100, 20, self.display_surface)

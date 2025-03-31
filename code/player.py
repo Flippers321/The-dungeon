@@ -13,6 +13,9 @@ class Player(pygame.sprite.Sprite):
         self.state, self.facing_right = 'idle', True
         self.image = self.frames[self.state][self.frame_index]
         
+        self.menu = Menu() # can not get menu to pause player movement and know when player is win
+        
+        
         #image
         self.respawn = pos
         self.end_pos = (0,0)
@@ -65,9 +68,9 @@ class Player(pygame.sprite.Sprite):
              #if data == '':
              #    self(self.default_settings)
              value = data.get(volume)
-             print('val', value)
+             #print('val', value)
              self.new_volume = (value / 100)
-             print('new_val', self.new_volume)
+             #print('new_val', self.new_volume)
              return(self.new_volume)
     def input(self):
 

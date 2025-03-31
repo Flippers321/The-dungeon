@@ -1,6 +1,5 @@
 from settings import *
 from timer import Timer
-from player import Player
 
 class Slime(pygame.sprite.Sprite):
     def __init__(self, pos, groups, collision_sprites, damage_sprites, player_sprite, frames):
@@ -37,14 +36,14 @@ class Slime(pygame.sprite.Sprite):
     def detection(self):
         #player detection
         self.detect_vector = [0, 0]
-        print(self.rect.x)
-        print(self.player.rect.x)
+        #print(self.rect.x)
+        #print(self.player.rect.x)
         #horizontal pathing
         if self.player.rect.x > self.rect.x:
-            print('pleyer is on the right')
+            #print('pleyer is on the right')
             self.detect_vector[0] += 1
         if self.player.rect.x < self.rect.x:
-            print('player is on the left')
+            #print('player is on the left')
             self.detect_vector[0] += -1
             
             #+16 so the slime doesnt keep jumping even if player is on the same tile hieght

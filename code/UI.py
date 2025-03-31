@@ -24,9 +24,7 @@ class Button:
             if pressed[0] == 1:
                 return True
             
-class InputBox:
-    pass
-            
+
 class Slider:
     def __init__(self, pos, size, initial_val, min, max):
         self.pos = pos
@@ -78,12 +76,72 @@ class Slider:
        #getting value of the slider
        return(slider_value/value_range)*(self.max - self.min) + self.min
    
-
-                       
+class InputBox:
+    def __init__(self, pos, size, font, pressed_submit = None):
+        self.keys = pygame.key.get_just_pressed()
+        self.active = False
+        self.input = ''
+        self.pos = pos
+        self.size = size
+        self.pressed_submit = pressed_submit
+        self.font = font
+        
+        self.left_pos = self.pos[0] - (size[0]//2)
+        self.top_pos = self.pos[1] - (size[1]//2)
+        
+    def get_click(self):
+        pos = pygame.mouse.get_pos()
+        pressed = pygame.mouse.get_pressed()
+        
+        #checking if mouse is clicked on the containder
+        if self.container_rect.collidepoint(pos):
+            if pressed[0] == 1:
+                self.active = True
+        else:
+            self.active = False
+    
+    def update(self):
+        if self.active:
+            for i in range(self.keys[pygame.K_a, pygame.K_z]):
+                if pygame.key.get_just_pressed()[i]:
+                    self.input += chr(i).upper()
+            for i in range(self.keys[pygame.K_0, pygame.K_9]):
+                if pygame.key.get_just_pressed()[i]:
+                    self.input += chr(i)
+            if self.keys[pygame.K_SPACE]:
+                self.input += ' '
+            if self.keys[pygame.K_BACKSPACE]:
+                self.input = self.input[:-1]
+            if self.keys[pygame.K_RETURN]:
+                self.active = False
+                if self.pressed_submit:
+                    self.pressed_submit(self.input)
+                    
+    def draw(self, screen):
+        self.container_rect = pygame.Rect(self.left_pos, self.top_pos, self.size[0], self.size[1])
+        pygame.draw.rect(screen, (30, 20, 18), self.container_rect)
+        
+        text_surface = self.font.render(self.input, True, (255, 255, 255))
+        screen.blit(text_surface, (self.left_pos + 5, self.top_pos + 5))                    
+                                   
    
 class Highscore:
     def __init__(self, user, score):
         pass
+            #         #leaderboard functions
+            # if self.paused_state == "leaderboard":
+            #     if self.buttons_leaderboard[0].get_click():
+            #         self.paused_state = "main"
+            #         self.game_paused = False
+            #         print(self.paused_state)
+            #     if self.buttons_leaderboard[1].get_click():
+            #         pygame.quit()
+            #         sys.exit()
+                
+                
+            #     #submitting highscore
+            # if self.win_input[0].input!= '' and self.win_input[0].input.isalpha():       
+            
         
 class Menu:
     def __init__(self):
@@ -103,6 +161,7 @@ class Menu:
                               'leaderboard': pygame.image.load(r'assets\Buttons\leaderboard.png').convert_alpha(),
                               'restart': pygame.image.load(r'assets\Buttons\restart.png').convert_alpha(),
                               'quit': pygame.image.load(r'assets\Buttons\quit.png').convert_alpha(),
+                              'submit': pygame.image.load(r'assets\Buttons\submit.png').convert_alpha()
                               }
         
         #button instances
@@ -118,6 +177,10 @@ class Menu:
         
         self.buttons_leaderboard = [Button(((WINDOW_WIDTH / 2), 120), self.button_images['resume'], 5),
                                     Button(((WINDOW_WIDTH - 25), 25), self.button_images['quit'], 3)]
+        self.buttons_win = [Button(((WINDOW_WIDTH - 25), 25), self.button_images['quit'], 3),
+                            Button(((WINDOW_WIDTH / 2), 120), self.button_images['submit'], 5)]
+        
+        self.win_input = [InputBox(((WINDOW_WIDTH // 2), WINDOW_HEIGHT /2), (100, 50), self.font)]
                                     
                 ##maybe add an altering to SCREEN_WIDTH/HEIGHT
         ## top fo vertical, just make taller than wide and change y to be mouse y instead
@@ -131,7 +194,7 @@ class Menu:
              #if data == '':
              #    self(self.default_settings)
              value = data.get(setting)
-             print('val', value)
+             #print('val', value)S
              return(value)
                    
     def save_settings(self):
@@ -158,6 +221,11 @@ class Menu:
             ##blur screen and make score stop, make player and enemy stop movement.
         self.actions()
              
+    def get_ifwin(self):
+        print('check win success')
+        self.game_paused = True
+        self.paused_state = "win" 
+        print('1' + self.paused_state)
             
     def actions(self):
         if self.game_paused == True:
@@ -183,9 +251,6 @@ class Menu:
                 elif self.buttons_main[4].get_click():
                     pygame.quit()
                     sys.exit()
-
-            else:
-                pass
                 
                 #options functions
             if self.paused_state == "options":
@@ -204,21 +269,24 @@ class Menu:
                     self.paused_state = "main"
                 if self.buttons_leaderboard[1].get_click():
                     pygame.quit()
-                    sys.exit()                
-            if self.paused_state == "gamewin":
-                if self.buttons_leaderboard[1].get_click():
+                    sys.exit()  
+            if self.paused_state == 'win':
+                print('here')
+                if self.buttons_win[0].get_click():
                     pygame.quit()
                     sys.exit()
-                
-
-
+                if self.buttons_win[1].get_click():
+                    pass
+        
+        print(self.paused_state)
+                    ##Highscore.submit
                 
     def draw_text(self, text, colour, x, y, surface):
         text_offset = (len(text)*8 //2) # centering words when more characters are added
         img = self.font.render(text, True, colour)
         surface.blit(img, (x - text_offset,y))
         
-    def draw(self, surface):
+    def draw(self, surface):           
         if self.game_paused == True:
             surface.fill(BACKGROUND_COLOUR)
         if self.paused_state == "main":
@@ -232,8 +300,20 @@ class Menu:
         if self.paused_state == 'leaderboard':
             for button in self.buttons_leaderboard: #sharing a button with 'main'
                 button.draw(surface)
+            for textbox in self.win_input: #thsi becoms a table of highscores
+                textbox.draw(surface)               
+                
+        if self.paused_state == 'win':
+            surface.fill(BACKGROUND_COLOUR)
+            print('should be filling')            
+            for button in self.buttons_win:
+                button.draw(surface)
+            for textbox in self.win_input: #sharing a text
+                textbox.draw(surface)                 
+
                 
             
-            
+
+                        
 
         
