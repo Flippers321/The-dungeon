@@ -77,16 +77,12 @@ class Level():
                 move_direction = 'x'
                 start_pos = (obj.x - 32, obj.y + obj.height/2)
                 end_pos = (obj.x + obj.width, obj.y + obj.height/2)
-                MovingSprite((self.all_sprites, self.collision_sprites), start_pos, end_pos, move_direction, self.platform_speed)   
+                MovingSprite((self.all_sprites, self.collision_sprites), start_pos, end_pos, move_direction, self.platform_speed)  
     def enemy_removal(self):
         if self.enemy.death() == True:
             self.enemy.rect.x = 260
             self.enemy.rect.y = 420
             self.score -= 50
-            
-    def check_restart(self):
-        if self.menu.paused_state == 'restart':
-            print('here')
 
     def update_score(self):
         self.score += 1
@@ -97,8 +93,7 @@ class Level():
     def check_win(self):
         if self.player.rect.colliderect(self.player.end_pos):
             return True
-            
-            self.rect = self.image.get_frect(topleft = self.respawn)
+        return False
             
     def draw_menu(self):
         if self.menu.game_paused == True:
@@ -113,6 +108,11 @@ class Level():
                 # self.menu.draw_text('Press ENTER to return', (100, 100, 100), 100, WINDOW_HEIGHT - 40, self.display_surface)
                 # self.menu.leaderboard_state()
                 # self.menu.leaderboard_actions()
+            if self.menu.paused_state == 'win':
+                print('/////////////\n///////////\nshould be printing')
+                self.menu.draw_text('Congratulations!', (100, 100, 100), 100, 20, self.display_surface)
+                self.menu.draw_text(f'Your Score: {round(self.score)}', (100, 100, 100), 100, 50, self.display_surface)
+                self.menu.draw_text('Press ENTER to return', (100, 100, 100), 100, WINDOW_HEIGHT - 40, self.display_surface)
             self.menu.draw_text(f'score: {round(self.score)}', (100, 100, 100), 80, WINDOW_HEIGHT - 40, self.display_surface)
 
         else:
@@ -127,10 +127,9 @@ class Level():
         self.display_surface.fill(BACKGROUND_COLOUR)
         self.all_sprites.update(dt)
         self.enemy_removal()
-        self.check_restart()
         self.check_win()
         self.update_score()
         self.all_sprites.draw(self.player)
         self.draw_menu()
-        self.menu.menu_state(self.display_surface)
+        self.menu.menu_state()
         self.menu.actions()

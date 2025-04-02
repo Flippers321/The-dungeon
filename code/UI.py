@@ -78,7 +78,7 @@ class Slider:
    
 class InputBox:
     def __init__(self, pos, size, font, pressed_submit = None):
-        self.keys = pygame.key.get_just_pressed()
+        #self.keys = pygame.key.get_just_pressed()
         self.active = False
         self.input = ''
         self.pos = pos
@@ -102,10 +102,10 @@ class InputBox:
     
     def update(self):
         if self.active:
-            for i in range(self.keys[pygame.K_a, pygame.K_z]):
+            for i in range(pygame.K_a, pygame.K_z):
                 if pygame.key.get_just_pressed()[i]:
                     self.input += chr(i).upper()
-            for i in range(self.keys[pygame.K_0, pygame.K_9]):
+            for i in range (pygame.K_0, pygame.K_9):
                 if pygame.key.get_just_pressed()[i]:
                     self.input += chr(i)
             if self.keys[pygame.K_SPACE]:
@@ -151,6 +151,7 @@ class Menu:
 
         #menu states
         self.game_paused = False
+        self.submition_level = False
         self.paused_state = "main"
         self.default_settings = {'volume': 0.5}
         self.new_setting = {'new_volume': 0}
@@ -205,7 +206,7 @@ class Menu:
              
         
         
-    def menu_state(self, surface): #should i make menu state a dictionary that then uses teh value in the dict to do things
+    def menu_state(self): #should i make menu state a dictionary that then uses teh value in the dict to do things
         keys = pygame.key.get_just_pressed()
         if keys[pygame.K_ESCAPE] and self.game_paused == False :
             self.game_paused = True
@@ -216,16 +217,14 @@ class Menu:
         elif keys[pygame.K_ESCAPE] and self.game_paused == True and self.paused_state != "main":
             self.paused_state = "main"
             print('back to main menu')
-            print(self.paused_state)
-            
-            ##blur screen and make score stop, make player and enemy stop movement.
-        self.actions()
              
-    def get_ifwin(self):
-        print('check win success')
-        self.game_paused = True
-        self.paused_state = "win" 
-        print('1' + self.paused_state)
+    def check_final_level(self):
+        print('should be true')
+        self.game_paused = True #this not pausing game???
+        print(self.game_paused) 
+        return True
+        
+    ##maybe do another function for the win state
             
     def actions(self):
         if self.game_paused == True:
@@ -238,7 +237,7 @@ class Menu:
                     
                 elif self.buttons_main[1].get_click():
                     self.paused_state = "options"
-                    print(self.paused_state)
+                    #print(self.paused_state)
                
                     
                 elif self.buttons_main[2].get_click():
@@ -270,6 +269,7 @@ class Menu:
                 if self.buttons_leaderboard[1].get_click():
                     pygame.quit()
                     sys.exit()  
+        
             if self.paused_state == 'win':
                 print('here')
                 if self.buttons_win[0].get_click():
@@ -278,7 +278,7 @@ class Menu:
                 if self.buttons_win[1].get_click():
                     pass
         
-        print(self.paused_state)
+        #print(self.paused_state)
                     ##Highscore.submit
                 
     def draw_text(self, text, colour, x, y, surface):
