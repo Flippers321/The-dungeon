@@ -84,9 +84,12 @@ class Level():
             self.enemy.rect.y = 420
             self.score -= 50
 
-    def update_score(self):
-        self.score += 1
-        return(self.score)
+    def update_score(self, level_count):
+        if level_count != 2:
+            self.score += 1
+            return(self.score)
+        # if self.menu.restart():
+        #     self.score = 0
             
 
         #if player movement start score, only increase score if paused = False
@@ -95,41 +98,46 @@ class Level():
             return True
         return False
             
-    def draw_menu(self):
-        if self.menu.game_paused == True:
-            self.menu.draw(self.display_surface)
-            if self.menu.paused_state == 'options':
-               #print(self.menu.volume)
-               self.menu.draw_text(f'Volume: {round(self.menu.volume)}', (100, 100, 100), (WINDOW_WIDTH / 2) - 16, 450, self.display_surface)
-               
-            if self.menu.paused_state == 'leaderboard':
-                self.menu.draw_text('highscores', (100, 100, 100), 50, 250, self.display_surface)
-                # self.menu.draw_leaderboard(self.display_surface)
-                # self.menu.draw_text('Press ENTER to return', (100, 100, 100), 100, WINDOW_HEIGHT - 40, self.display_surface)
-                # self.menu.leaderboard_state()
-                # self.menu.leaderboard_actions()
-            if self.menu.paused_state == 'win':
-                print('/////////////\n///////////\nshould be printing')
-                self.menu.draw_text('Congratulations!', (100, 100, 100), 100, 20, self.display_surface)
-                self.menu.draw_text(f'Your Score: {round(self.score)}', (100, 100, 100), 100, 50, self.display_surface)
-                self.menu.draw_text('Press ENTER to return', (100, 100, 100), 100, WINDOW_HEIGHT - 40, self.display_surface)
-            self.menu.draw_text(f'score: {round(self.score)}', (100, 100, 100), 80, WINDOW_HEIGHT - 40, self.display_surface)
+    def draw_menu(self, level_count):
+        if level_count != 2:
+            if self.menu.game_paused == True:
+                self.menu.draw(self.display_surface)
+                if self.menu.paused_state == 'options':
+                #print(self.menu.volume)
+                    self.menu.draw_text(f'Volume: {round(self.menu.volume)}', (100, 100, 100), (WINDOW_WIDTH / 2) - 16, 450, self.display_surface)
+                
+                if self.menu.paused_state == 'leaderboard':
+                    self.menu.draw_text('highscores', (100, 100, 100), 50, 250, self.display_surface)
+                    # self.menu.draw_leaderboard(self.display_surface)
+                    # self.menu.draw_text('Press ENTER to return', (100, 100, 100), 100, WINDOW_HEIGHT - 40, self.display_surface)
+                    # self.menu.leaderboard_state()
+                    # self.menu.leaderboard_actions()
+                if self.menu.paused_state == 'win':
+                    print('/////////////\n///////////\nshould be printing')
+                    self.menu.draw_text('Congratulations!', (100, 100, 100), 100, 20, self.display_surface)
+                    self.menu.draw_text(f'Your Score: {round(self.score)}', (100, 100, 100), 100, 50, self.display_surface)
+                    self.menu.draw_text('Press ENTER to return', (100, 100, 100), 100, WINDOW_HEIGHT - 40, self.display_surface)
+                self.menu.draw_text(f'score: {round(self.score)}', (100, 100, 100), 80, WINDOW_HEIGHT - 40, self.display_surface)
+
+            else:
+                self.menu.draw_text('Press ESC to Pause', (100, 100, 100), 100, 20, self.display_surface)
+                self.menu.draw_text('Press LSHIFT to Dash', (100, 100, 100), 100, 50, self.display_surface)
+                self.menu.draw_text(f'score: {round(self.score)}', (100, 100, 100), 80, WINDOW_HEIGHT - 40, self.display_surface)
+                self.menu.draw_text(f'Lives: {round(self.player.health)}', (100, 100, 100), 200, WINDOW_HEIGHT - 40, self.display_surface)
 
         else:
-            self.menu.draw_text('Press ESC to Pause', (100, 100, 100), 100, 20, self.display_surface)
-            self.menu.draw_text('Press LSHIFT to Dash', (100, 100, 100), 100, 50, self.display_surface)
-            self.menu.draw_text(f'score: {round(self.score)}', (100, 100, 100), 80, WINDOW_HEIGHT - 40, self.display_surface)
-            self.menu.draw_text(f'Lives: {round(self.player.health)}', (100, 100, 100), 200, WINDOW_HEIGHT - 40, self.display_surface)
-     
+            self.menu.draw_text(f'Your Score: {round(self.score)}', (255, 255, 255), (WINDOW_WIDTH / 2), 50, self.display_surface)
 
            
-    def run(self, dt):
+    def run(self, dt, level_count):
         self.display_surface.fill(BACKGROUND_COLOUR)
         self.all_sprites.update(dt)
         self.enemy_removal()
         self.check_win()
-        self.update_score()
+        self.update_score(level_count)
         self.all_sprites.draw(self.player)
-        self.draw_menu()
-        self.menu.menu_state()
-        self.menu.actions()
+        self.draw_menu(level_count)
+        self.menu.menu_state(level_count)
+        self.menu.paused_actions()
+        self.menu.win_actions()
+        #self.menu.restart()

@@ -5,7 +5,7 @@ from pytmx.util_pygame import load_pygame
 from os.path import join
 from functions import *
 
-## Game Engine inspired by ClearCode: https://www.youtube.com/@ClearCode
+## Game Engine + timers inspired by ClearCode: https://www.youtube.com/@ClearCode
 
 class Game:
     def __init__(self):
@@ -18,7 +18,7 @@ class Game:
         self.tmx_maps = [load_pygame('data/levels/level1.tmx'),
                          load_pygame('data/levels/level2.tmx'),
                          load_pygame('data/levels/level3.tmx')]
-        self.level_count = 0
+        self.level_count = 2
         self.score = 0
         self.current_stage = Level(self.tmx_maps[self.level_count], self.obj_frames, self.score)
         self.menu = Menu()
@@ -39,10 +39,10 @@ class Game:
                     pygame.quit()
                     sys.exit()
                     
-            self.current_score = self.current_stage.update_score()
+            self.current_score = self.current_stage.update_score(self.level_count)
             #print(self.current_score)
 
-            self.current_stage.run(dt)
+            self.current_stage.run(dt, self.level_count)
             
                 
             if self.current_stage.check_win():
@@ -51,8 +51,11 @@ class Game:
                 self.level_count += 1
                 self.current_stage = Level(self.tmx_maps[self.level_count], self.obj_frames, self.current_score)
 
-            if self.level_count == 2:
-                self.menu.check_final_level()
+            # if self.level_count == 2:
+            #     self.menu.check_final_level()
+            
+            # if self.menu.restart():
+            #     self.level_count = 0 
 
             
             pygame.display.update()
