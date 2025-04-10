@@ -71,6 +71,7 @@ class Player(pygame.sprite.Sprite):
              #print('val', value)
              self.new_volume = (value / 100)
              #print('new_val', self.new_volume)
+
              return(self.new_volume)
     def input(self):
 
@@ -92,7 +93,6 @@ class Player(pygame.sprite.Sprite):
                 self.facing_right = True
             #if opposite keys (a , d) are simultaniously pressed, vector movement = 0
             
-
         #jumping
         if key_down[pygame.K_SPACE]:
             self.jump = True
@@ -224,6 +224,8 @@ class Player(pygame.sprite.Sprite):
         for sprite in self.enemy_sprites:
             if sprite.rect.colliderect(self.rect) and not self.timers['damage'].active:
                 self.health -= 1
+                self.hit_sound.play()
+                self.hit_sound.set_volume(self.get_volume('volume'))
                 self.timers['damage'].activate()
                 print('enemies hurt')
                 if self.health <= 0:
