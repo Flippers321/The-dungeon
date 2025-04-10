@@ -18,7 +18,7 @@ class Game:
         self.tmx_maps = [load_pygame('data/levels/level1.tmx'),
                          load_pygame('data/levels/level2.tmx'),
                          load_pygame('data/levels/level3.tmx')]
-        self.level_count = 2
+        self.level_count = 1
         self.score = 0
         self.current_stage = Level(self.tmx_maps[self.level_count], self.obj_frames, self.score)
         self.menu = Menu()
@@ -51,6 +51,11 @@ class Game:
                 self.level_count += 1
                 self.current_stage = Level(self.tmx_maps[self.level_count], self.obj_frames, self.current_score)
 
+            if self.current_stage.check_restart():
+                print('2 restart')
+                self.level_count = 0
+                self.current_score = 0
+                self.current_stage = Level(self.tmx_maps[self.level_count], self.obj_frames, self.current_score)
             # if self.level_count == 2:
             #     self.menu.check_final_level()
             

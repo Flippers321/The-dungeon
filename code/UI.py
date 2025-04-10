@@ -152,7 +152,8 @@ class Menu:
 
         #menu states
         self.game_paused = False
-        self.submition_level = False
+        self.submit = False
+        self.restart = False
         self.paused_state = "main"
         self.default_settings = {'volume': 0.5}
         self.new_setting = {'new_volume': 0}
@@ -180,7 +181,7 @@ class Menu:
         self.buttons_leaderboard = [Button(((WINDOW_WIDTH / 2), 120), self.button_images['resume'], 5),
                                     Button(((WINDOW_WIDTH - 25), 25), self.button_images['quit'], 3)]
         self.buttons_win = [Button(((WINDOW_WIDTH - 25), 25), self.button_images['quit'], 3),
-                            Button(((WINDOW_WIDTH / 2), 120), self.button_images['submit'], 5)]
+                            Button(((WINDOW_WIDTH / 2), 150), self.button_images['submit'], 5)]
         
         self.win_input = [InputBox(((WINDOW_WIDTH // 2), WINDOW_HEIGHT /2), (100, 50), self.font)]
                                     
@@ -209,20 +210,20 @@ class Menu:
         
     def menu_state(self, level_count): #should i make menu state a dictionary that then uses teh value in the dict to do things
         keys = pygame.key.get_just_pressed()
-        #if level_count != 2:
-        if keys[pygame.K_ESCAPE] and self.game_paused == False :
-            self.game_paused = True
-            print(self.game_paused)
-        elif keys[pygame.K_ESCAPE] and self.game_paused == True and self.paused_state == "main":
-            self.game_paused = False
-            print(self.game_paused) 
-        elif keys[pygame.K_ESCAPE] and self.game_paused == True and self.paused_state != "main":
-            self.paused_state = "main"
-            print('back to main menu')
-        # if level_count == 2:
-        #     if keys[pygame.K_ESCAPE]:
-        #         self.game_paused = True
-        #         self.paused_state = "win"
+        if level_count != 2:
+            if keys[pygame.K_ESCAPE] and self.game_paused == False :
+                self.game_paused = True
+                print(self.game_paused)
+            elif keys[pygame.K_ESCAPE] and self.game_paused == True and self.paused_state == "main":
+                self.game_paused = False
+                print(self.game_paused) 
+            elif keys[pygame.K_ESCAPE] and self.game_paused == True and self.paused_state != "main":
+                self.paused_state = "main"
+                print('back to main menu')
+        if level_count == 2:
+            if keys[pygame.K_ESCAPE]:
+                self.game_paused = True
+                #self.paused_state = "win"
              
     # def check_final_level(self):
     #     print('should be true')
@@ -254,6 +255,7 @@ class Menu:
                     self.paused_state = "leaderboard"
                     
                 elif self.buttons_main[3].get_click():
+                    self.restart = True
                     self.game_paused = False
                     #self.restart()
                     #self.paused_state = "main"
@@ -282,37 +284,42 @@ class Menu:
                     sys.exit()  
         
     def win_actions(self):
-        if self.paused_state == 'win':
-            print('here')
-            if self.buttons_win[0].get_click():
-                pygame.quit()
-                sys.exit()
-            if self.buttons_win[1].get_click():
-                pass        
+        if self.game_paused == True:
+            if self.paused_state == 'win':
+                print('here')
+                if self.buttons_win[0].get_click():
+                    pygame.quit()
+                    sys.exit()
+                if self.buttons_win[1].get_click():
+                    self.submit = True
+                    print(self.sumbit)
+                    pass        
                 
     def draw_text(self, text, colour, x, y, surface):
         text_offset = (len(text)*8 //2) # centering words when more characters are added
         img = self.font.render(text, True, colour)
         surface.blit(img, (x - text_offset,y))
         
-    def draw(self, surface):           
-        if self.game_paused == True:
-            surface.fill(BACKGROUND_COLOUR)
-        if self.paused_state == "main":
-            for button in self.buttons_main:
-                button.draw(surface)
-        if self.paused_state == "options":
-            for button in self.buttons_options:
-                button.draw(surface)
-            for slider in self.sliders:
-                slider.draw(surface)
-        if self.paused_state == 'leaderboard':
-            for button in self.buttons_leaderboard: #sharing a button with 'main'
-                button.draw(surface)
-            for textbox in self.win_input: #thsi becoms a table of highscores
-                textbox.draw(surface)               
+    def draw(self, surface, level_count):
+        if level_count !=2:           
+            if self.game_paused == True:
+                surface.fill(BACKGROUND_COLOUR)
+            if self.paused_state == "main":
+                for button in self.buttons_main:
+                    button.draw(surface)
+            if self.paused_state == "options":
+                for button in self.buttons_options:
+                    button.draw(surface)
+                for slider in self.sliders:
+                    slider.draw(surface)
+            if self.paused_state == 'leaderboard':
+                for button in self.buttons_leaderboard: #sharing a button with 'main'
+                    button.draw(surface)
+                for textbox in self.win_input: #thsi becoms a table of highscores
+                    textbox.draw(surface)               
                 
-        if self.paused_state == 'win':           
+        #if self.paused_state == 'win':  
+        else:         
             for button in self.buttons_win:
                 button.draw(surface)
             for textbox in self.win_input: #sharing a text

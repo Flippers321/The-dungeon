@@ -217,7 +217,6 @@ class Player(pygame.sprite.Sprite):
                 self.hit_sound.play()
                 self.hit_sound.set_volume(self.get_volume('volume'))
                 self.timers['damage'].activate()
-                print(self.health)
                 if self.health <= 0:
                     self.death()
                     
@@ -226,7 +225,6 @@ class Player(pygame.sprite.Sprite):
             if sprite.rect.colliderect(self.rect) and not self.timers['damage'].active:
                 self.health -= 1
                 self.timers['damage'].activate()
-                print(self.health)
                 print('enemies hurt')
                 if self.health <= 0:
                     self.death()
@@ -236,8 +234,11 @@ class Player(pygame.sprite.Sprite):
                     print('enemy felled')
                     self.kill_sound.play()
                     self.kill_sound.set_volume(self.get_volume('volume'))
-                    return True                
+                    return True               
                 
+    def check_ifdead(self):
+        if self.health <= 0:
+            self.death
 
     def death(self):
         self.rect = self.image.get_frect(topleft = self.respawn)

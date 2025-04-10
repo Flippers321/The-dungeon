@@ -86,8 +86,9 @@ class Level():
 
     def update_score(self, level_count):
         if level_count != 2:
-            self.score += 1
+            self.score += 1        
             return(self.score)
+
         # if self.menu.restart():
         #     self.score = 0
             
@@ -97,11 +98,18 @@ class Level():
         if self.player.rect.colliderect(self.player.end_pos):
             return True
         return False
+    
+    def check_restart(self):
+        if self.menu.restart == True:
+            print('1 restart')
+            self.menu.restart = False
+            return True
             
+    #displaying the menus
     def draw_menu(self, level_count):
         if level_count != 2:
             if self.menu.game_paused == True:
-                self.menu.draw(self.display_surface)
+                self.menu.draw(self.display_surface, level_count)
                 if self.menu.paused_state == 'options':
                 #print(self.menu.volume)
                     self.menu.draw_text(f'Volume: {round(self.menu.volume)}', (100, 100, 100), (WINDOW_WIDTH / 2) - 16, 450, self.display_surface)
@@ -127,6 +135,12 @@ class Level():
 
         else:
             self.menu.draw_text(f'Your Score: {round(self.score)}', (255, 255, 255), (WINDOW_WIDTH / 2), 50, self.display_surface)
+            self.menu.draw_text('Congratulations!', (255, 255, 255), 100, 50, self.display_surface)
+            if self.menu.game_paused == False and self.menu.submit == False:
+                self.menu.draw_text('press ESC to submit score!', (255, 255, 255), (WINDOW_WIDTH / 2), 70, self.display_surface)
+            if self.menu.game_paused == True:
+                self.menu.draw(self.display_surface, level_count)
+                
 
            
     def run(self, dt, level_count):
@@ -134,6 +148,7 @@ class Level():
         self.all_sprites.update(dt)
         self.enemy_removal()
         self.check_win()
+        self.check_restart()
         self.update_score(level_count)
         self.all_sprites.draw(self.player)
         self.draw_menu(level_count)
