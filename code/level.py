@@ -4,6 +4,7 @@ from player import Player
 from enemy import Slime
 from groups import CameraGroup
 from UI import Menu
+import requests, json
 
 class Level():
     def __init__(self, tmx_map, obj_frames, score):
@@ -105,6 +106,25 @@ class Level():
             self.menu.restart = False
             return True
             
+    def post_score(self, name, score):    
+        if self.menu.submit == True and self.menu.name != '':
+            try:
+                request = requests.post("http://127.0.0.1:5000/leaderboard", json = json.dumps({ "data": [name, score]}))
+                self.menu.submit = False
+            except:
+                print("ERROR SENDING TO SERVER")
+        
+    def get_highscores(self):
+        try:
+            highscores = requests.get("http://127.0.0.1:5000/SERVER")
+        except:
+            print("FAILED TO CONNECT TO THE SERVER")
+        
+        for score in highscores:
+            print(f'score \n') #(instead of print do draw_text? just callk it on line 150)
+        #line 150
+        print(highscores)
+        
     #displaying the menus
     def draw_menu(self, level_count):
         if level_count != 2:
@@ -127,6 +147,8 @@ class Level():
                     self.menu.draw_text('Press ENTER to return', (100, 100, 100), 100, WINDOW_HEIGHT - 40, self.display_surface)
                 self.menu.draw_text(f'score: {round(self.score)}', (100, 100, 100), 80, WINDOW_HEIGHT - 40, self.display_surface)
 
+                if self.menu.paused_state == 'leaderboard':
+                    self.menu.draw_text(self.get_highscores()) ## drawing the leaderboard to screen
             else:
                 self.menu.draw_text('Press ESC to Pause', (100, 100, 100), 100, 20, self.display_surface)
                 self.menu.draw_text('Press LSHIFT to Dash', (100, 100, 100), 100, 50, self.display_surface)
@@ -139,6 +161,7 @@ class Level():
             if self.menu.game_paused == False and self.menu.submit == False:
                 self.menu.draw_text('press ESC to submit score!', (255, 255, 255), (WINDOW_WIDTH / 2), 70, self.display_surface)
             if self.menu.game_paused == True:
+                self.menu.draw_text('username:', (255, 255, 255), (WINDOW_WIDTH / 2), 320, self.display_surface)
                 self.menu.draw(self.display_surface, level_count)
                 
 
@@ -150,6 +173,8 @@ class Level():
         self.check_win()
         self.check_restart()
         self.update_score(level_count)
+        self.post_score(self.menu.name, self.score)
+        self.get_highscores()
         self.all_sprites.draw(self.player)
         self.draw_menu(level_count)
         self.menu.menu_state(level_count)

@@ -18,7 +18,7 @@ class Game:
         self.tmx_maps = [load_pygame('data/levels/level1.tmx'),
                          load_pygame('data/levels/level2.tmx'),
                          load_pygame('data/levels/level3.tmx')]
-        self.level_count = 1
+        self.level_count = 2
         self.score = 0
         self.current_stage = Level(self.tmx_maps[self.level_count], self.obj_frames, self.score)
         self.menu = Menu()

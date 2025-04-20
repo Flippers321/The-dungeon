@@ -134,7 +134,7 @@ class Player(pygame.sprite.Sprite):
         if self.jump:
             self.jump_sound.play()
             self.jump_sound.set_volume(self.get_volume('volume'))
-            print(self.get_volume('volume'))
+            #print(self.get_volume('volume'))
             if self.on_surface['floor']:
                 self.direction.y = -self.jump_height
             elif self.on_surface['left']:
