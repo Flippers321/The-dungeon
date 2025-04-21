@@ -109,24 +109,27 @@ class Level():
     def post_score(self, name, score):    
         if self.menu.submit == True and self.menu.name != '':
             try:
+                print('this pont')
                 request = requests.post("http://127.0.0.1:5000/leaderboard", json = json.dumps({ "data": [name, score]}))
                 self.menu.submit = False
             except:
                 print("ERROR SENDING TO SERVER")
         
-    def get_highscores(self):
+    def draw_highscores(self, num_offset, centre_offset_score, centre_offset_user, text_size = 28):
         try:
-            highscores = requests.get("http://127.0.0.1:5000/SERVER")
+            highscores = requests.get("http://127.0.0.1:5000/SERVER") #TODO
         except:
-            print("FAILED TO CONNECT TO THE SERVER")
+            self.menu.draw_text(f'FAILED TO LOAD CONNECT TO SERVER', (100, 100, 100), ((WINDOW_WIDTH//2) - centre_offset_user),(250 + 24*i), self.display_surface, size = 32)
         
-        for score in highscores:
-            print(f'score \n') #(instead of print do draw_text? just callk it on line 150)
-        #line 150
-        print(highscores)
+        for i,score in enumerate(highscores.json()):
+            self.menu.draw_text(f'{i + 1}.', (100, 100, 100), ((WINDOW_WIDTH//2) - num_offset),(250 + 24*i), self.display_surface, size = text_size)
+            self.menu.draw_text(f'{score[0]}', (100, 100, 100), ((WINDOW_WIDTH//2) - centre_offset_user),(250 + 24*i), self.display_surface, size = text_size) #(instead of print do draw_text? just callk it on line 150)
+            self.menu.draw_text(f'{score[1]}', (100, 100, 100), ((WINDOW_WIDTH//2) + centre_offset_score),(250 + 24*i), self.display_surface, size = text_size)
         
     #displaying the menus
     def draw_menu(self, level_count):
+        self.previous_scores = True
+        
         if level_count != 2:
             if self.menu.game_paused == True:
                 self.menu.draw(self.display_surface, level_count)
@@ -134,12 +137,7 @@ class Level():
                 #print(self.menu.volume)
                     self.menu.draw_text(f'Volume: {round(self.menu.volume)}', (100, 100, 100), (WINDOW_WIDTH / 2) - 16, 450, self.display_surface)
                 
-                if self.menu.paused_state == 'leaderboard':
-                    self.menu.draw_text('highscores', (100, 100, 100), 50, 250, self.display_surface)
-                    # self.menu.draw_leaderboard(self.display_surface)
-                    # self.menu.draw_text('Press ENTER to return', (100, 100, 100), 100, WINDOW_HEIGHT - 40, self.display_surface)
-                    # self.menu.leaderboard_state()
-                    # self.menu.leaderboard_actions()
+                
                 if self.menu.paused_state == 'win':
                     print('/////////////\n///////////\nshould be printing')
                     self.menu.draw_text('Congratulations!', (100, 100, 100), 100, 20, self.display_surface)
@@ -147,8 +145,13 @@ class Level():
                     self.menu.draw_text('Press ENTER to return', (100, 100, 100), 100, WINDOW_HEIGHT - 40, self.display_surface)
                 self.menu.draw_text(f'score: {round(self.score)}', (100, 100, 100), 80, WINDOW_HEIGHT - 40, self.display_surface)
 
+                
                 if self.menu.paused_state == 'leaderboard':
-                    self.menu.draw_text(self.get_highscores()) ## drawing the leaderboard to screen
+                    self.menu.draw_text('user', (100, 200, 100), ((WINDOW_WIDTH//2) - 150), 200, self.display_surface, size = 30)
+                    self.menu.draw_text('score', (100, 200, 100), ((WINDOW_WIDTH//2) + 150), 200, self.display_surface, size = 30)
+                    self.draw_highscores(200, 150, 150) #setting the users, scores, and positions of the leaderboards offsets from the centre of the screen (same as the 'user','score' text offsets)
+
+
             else:
                 self.menu.draw_text('Press ESC to Pause', (100, 100, 100), 100, 20, self.display_surface)
                 self.menu.draw_text('Press LSHIFT to Dash', (100, 100, 100), 100, 50, self.display_surface)
@@ -156,6 +159,10 @@ class Level():
                 self.menu.draw_text(f'Lives: {round(self.player.health)}', (100, 100, 100), 200, WINDOW_HEIGHT - 40, self.display_surface)
 
         else:
+            # if self.menu.reload_scores == True:
+            #     self.previous_scores = False
+            #     self.draw_highscores(500, -350, 450)
+            
             self.menu.draw_text(f'Your Score: {round(self.score)}', (255, 255, 255), (WINDOW_WIDTH / 2), 50, self.display_surface)
             self.menu.draw_text('Congratulations!', (255, 255, 255), 100, 50, self.display_surface)
             if self.menu.game_paused == False and self.menu.submit == False:
@@ -163,6 +170,12 @@ class Level():
             if self.menu.game_paused == True:
                 self.menu.draw_text('username:', (255, 255, 255), (WINDOW_WIDTH / 2), 320, self.display_surface)
                 self.menu.draw(self.display_surface, level_count)
+
+            self.menu.draw_text('Previous Highscores', (150, 150, 150), ((WINDOW_WIDTH//2) - 400), 180, self.display_surface, size = 15)
+            self.menu.draw_text('user', (100, 200, 100), ((WINDOW_WIDTH//2) - 440), 220, self.display_surface, size = 15)
+            self.menu.draw_text('score', (100, 200, 100), ((WINDOW_WIDTH//2) - 340), 220, self.display_surface, size = 15)
+            self.draw_highscores(500, -350, 450, 20)                    
+                    
                 
 
            
@@ -174,7 +187,6 @@ class Level():
         self.check_restart()
         self.update_score(level_count)
         self.post_score(self.menu.name, self.score)
-        self.get_highscores()
         self.all_sprites.draw(self.player)
         self.draw_menu(level_count)
         self.menu.menu_state(level_count)

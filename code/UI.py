@@ -96,14 +96,14 @@ class InputBox:
         if self.container_rect.collidepoint(pos):
             if pressed[0] == 1:
                 self.active = True
-                print(self.active)
-                print('textbox xlixked')
+                #print(self.active)
+                #print('textbox xlixked')
                 return True
         return False
     
     def update(self):
         if self.active == True:
-            print('input active')
+            #print('input active')
             if len(self.input) < 10:
                 for i in range(pygame.K_a, pygame.K_z):
                     if pygame.key.get_just_pressed()[i]:
@@ -114,8 +114,8 @@ class InputBox:
                 if pygame.key.get_just_pressed()[pygame.K_BACKSPACE]:
                     self.input = self.input[:-1]
                 if self.keys[pygame.K_RETURN]:
-                    self.post()
-            print(self.input)
+                    self.active = False ####
+            #print(self.input)
         return self.input
                     
     def draw(self, screen):
@@ -135,6 +135,7 @@ class Menu:
         self.game_paused = False
         self.submit = False
         self.restart = False
+        self.reload_scores = False
         self.paused_state = "main"
         self.default_settings = {'volume': 0.5}
         self.new_setting = {'new_volume': 0}
@@ -161,6 +162,7 @@ class Menu:
         
         self.buttons_leaderboard = [Button(((WINDOW_WIDTH / 2), 120), self.button_images['resume'], 5),
                                     Button(((WINDOW_WIDTH - 25), 25), self.button_images['quit'], 3)]
+        
         self.buttons_win = [Button(((WINDOW_WIDTH - 25), 25), self.button_images['quit'], 3),
                             Button(((WINDOW_WIDTH / 2), 150), self.button_images['submit'], 5)]
         
@@ -253,6 +255,8 @@ class Menu:
                     sys.exit()  
         
     def win_actions(self):
+        # if self.win_input[0]:
+        #     self.win_input[0].update()
         if self.game_paused == True:
             if self.paused_state == 'win':
                 if self.buttons_win[0].get_click():
@@ -263,9 +267,10 @@ class Menu:
                     self.game_paused = False ####
                 if self.win_input[0].get_click():
                     self.name = (self.win_input[0].update())
-                     
+                    
                 
-    def draw_text(self, text, colour, x, y, surface):
+    def draw_text(self, text, colour, x, y, surface, size = 16):
+        self.font = pygame.font.Font(r'assets\Perfect DOS VGA 437.ttf', size)
         text_offset = (len(text)*8 //2) # centering words when more characters are added
         img = self.font.render(text, True, colour)
         surface.blit(img, (x - text_offset,y))

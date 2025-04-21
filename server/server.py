@@ -42,7 +42,7 @@ def merge_sort(array, key):
             j += 1
             k += 1
             
-    return array[::-1]
+    return array #scores should be lowest first so don't reverse the order again
     
 
 @app.route("/leaderboard", methods=["POST"])
