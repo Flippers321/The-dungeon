@@ -9,21 +9,23 @@ from functions import *
 
 class Game:
     def __init__(self):
+        #initialise the game
         pygame.init()
         self.display_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         pygame.display.set_caption('platformer game')
         self.clock = pygame.time.Clock()
-        self.import_sprites()
+        self.import_sprites() #importing sprite frames
         
-        self.tmx_maps = [load_pygame('data/levels/level1.tmx'),
-                         load_pygame('data/levels/level2.tmx'),
-                         load_pygame('data/levels/level3.tmx')]
-        self.level_count = 0
-        self.score = 0
+        #loading TMX maps for each level
+        self.tmx_maps = [
+            load_pygame('data/levels/level1.tmx'),
+            load_pygame('data/levels/level2.tmx'),
+            load_pygame('data/levels/level3.tmx')
+            ]
+        self.level_count = 0 #intial/starting level
+        self.score = 0 #initial score
         self.current_stage = Level(self.tmx_maps[self.level_count], self.obj_frames, self.score, self.level_count)
-        self.menu = Menu()
-        
-        
+        self.menu = Menu() #initilising the menu
         
     def import_sprites(self):
         self.obj_frames = {
@@ -46,21 +48,15 @@ class Game:
             
                 
             if self.current_stage.check_win():
-                print('win')
-                #if self.level_count == 0:
+                #checking if player has won/reached end point of level
                 self.level_count += 1
                 self.current_stage = Level(self.tmx_maps[self.level_count], self.obj_frames, self.current_score, self.level_count)
 
             if self.current_stage.check_restart():
-                print('2 restart')
+                #action if player has restarted game
                 self.level_count = 0
                 self.current_score = 0
                 self.current_stage = Level(self.tmx_maps[self.level_count], self.obj_frames, self.current_score, self.level_count)
-            # if self.level_count == 2:
-            #     self.menu.check_final_level()
-            
-            # if self.menu.restart():
-            #     self.level_count = 0 
 
             
             pygame.display.update()

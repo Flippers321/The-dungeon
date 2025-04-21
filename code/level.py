@@ -11,7 +11,7 @@ class Level():
         self.display_surface = pygame.display.get_surface()
         pygame.mixer.init()
         
-        #groups
+        #groups for managing sprites
         self.all_sprites = CameraGroup()
         self.collision_sprites = pygame.sprite.Group()
         self.damage_sprites = pygame.sprite.Group()
@@ -21,12 +21,15 @@ class Level():
         self.score = score
         self.menu = Menu()
         #audio
-        self.audio = {'jump': pygame.mixer.Sound('assets\MP3\sound1.mp3'),
-                      'dash': pygame.mixer.Sound('assets\MP3\Retro10.mp3'),
-                      'kill': pygame.mixer.Sound('assets\MP3\Retro7.mp3'),
-                      'death': pygame.mixer.Sound('assets\MP3\death.mp3'),
-                      'dash': pygame.mixer.Sound('assets\MP3\dash.mp3'),
-                      'hit': pygame.mixer.Sound('assets\MP3\hit.mp3')}
+        self.audio = {
+            'jump': pygame.mixer.Sound('assets\MP3\sound1.mp3'),
+            'dash': pygame.mixer.Sound('assets\MP3\Retro10.mp3'),
+            'kill': pygame.mixer.Sound('assets\MP3\Retro7.mp3'),
+            'death': pygame.mixer.Sound('assets\MP3\death.mp3'),
+            'dash': pygame.mixer.Sound('assets\MP3\dash.mp3'),
+            'hit': pygame.mixer.Sound('assets\MP3\hit.mp3')
+            }
+        
         self.platform_speed = 100
         self.setup(tmx_map, obj_frames)    
     #getting pos of values stored in layer
@@ -34,15 +37,13 @@ class Level():
         #tiles
         for layer in ['spikes', 'platforms', 'cave', 'climbing chains', 'background obj']:
             for x,y,surf in tmx_map.get_layer_by_name(layer).tiles():
-                #layer object now contains numbers instead of names, get the names 
+                #Add tiles to appropriate groups based on the layer 
                 groups = [self.all_sprites]
                 if layer == 'cave': groups.append(self.collision_sprites)
                 if layer == 'platforms': groups.append(self.collision_sprites)
                 if layer == 'spikes': groups.append(self.damage_sprites)
                 z = Z_LAYERS['climbing chains']
                 Sprite((x * TILE_SIZE, y * TILE_SIZE), surf, groups, z)
-
-        #for enemy in Slime : groups.append(self.enemy_sprites)
         
         #spawn objects
         for obj in tmx_map.get_layer_by_name('spawn'):
@@ -50,6 +51,7 @@ class Level():
                 self.player.end_pos = pygame.Rect(obj.x, obj.y, obj.width, obj.height)
                 
             if obj.name == 'start':
+                #initialising the player at the start pos
                 self.player = Player(
                     pos = (obj.x, obj.y),
                     groups = self.all_sprites, 
@@ -59,27 +61,31 @@ class Level():
                     health = 10,
                     frames = obj_frames['player'],
                     audio = self.audio,
-                    level_count = self.level_count)    
+                    level_count = self.level_count
+                    )    
                              
             if obj.name == 'enemy':
+                #initialising the enemy at the specified location
                 self.enemy = Slime(
                     pos = (obj.x, obj.y),
                     groups = [self.all_sprites, self.enemy_sprites],
                     collision_sprites = self.collision_sprites, 
                     damage_sprites = self.damage_sprites,
                     player_sprite = self.player,
-                    frames = obj_frames['enemy'],)
-                    #player_pos = self.player.rect)
-                    
+                    frames = obj_frames['enemy']
+                    )                   
                 groups.append(self.enemy_sprites)      
                 
         for obj in tmx_map.get_layer_by_name('Moving_objects'):
             if obj.name == 'moving wall left':
+                #initialise moving platfrom with start/end positions
                 move_direction = 'x'
                 start_pos = (obj.x - 32, obj.y + obj.height/2)
                 end_pos = (obj.x + obj.width, obj.y + obj.height/2)
                 MovingSprite((self.all_sprites, self.collision_sprites), start_pos, end_pos, move_direction, self.platform_speed)  
+                
     def enemy_removal(self, level_count):
+        #moving enemy to 'cage' when felled, different based on level
         if self.enemy.death() == True:
             if level_count == 0:
                 #amount of tiles (using the tmx file) for position of enemy cage
@@ -88,29 +94,25 @@ class Level():
             if level_count == 1:
                 self.enemy.rect.x = 33 * TILE_SIZE 
                 self.enemy.rect.y = 66 * TILE_SIZE 
-            self.score -= 500
+            self.score -= 700 #bonus score as insentive to make player kill the enemy in each level
 
     def update_score(self, level_count):
         if level_count != 2:
             self.score += 1
-            #making sure score doesnt go negative (as killing an enemy decreases score)
-            #This also makes it so the lowesr score (the best one) can only be 0
+            #ensure score doesnt go negative (as killing an enemy decreases score)
+            #this also makes it so the lowesr score (the best one) can only be 0
             if self.score < 0:
                 self.score = 0        
-            return(self.score)
+            return self.score
 
-
-        # if self.menu.restart():
-        #     self.score = 0
-            
-
-        #if player movement start score, only increase score if paused = False
     def check_win(self):
+        #check if player has reached end position
         if self.player.rect.colliderect(self.player.end_pos):
             return True
         return False
     
     def check_restart(self):
+        #check is game should be restarted
         if self.menu.restart == True:
             print('1 restart')
             self.menu.restart = False
@@ -177,7 +179,7 @@ class Level():
                 self.menu.draw_text('username:', (255, 255, 255), (WINDOW_WIDTH / 2), 320, self.display_surface)
                 self.menu.draw(self.display_surface, level_count)
 
-            self.menu.draw_text('Previous Highscores', (150, 150, 150), ((WINDOW_WIDTH//2) - 400), 180, self.display_surface, size = 15)
+            self.menu.draw_text('Highscores', (150, 150, 150), ((WINDOW_WIDTH//2) - 400), 180, self.display_surface, size = 15)
             self.menu.draw_text('user', (100, 200, 100), ((WINDOW_WIDTH//2) - 440), 220, self.display_surface, size = 15)
             self.menu.draw_text('score', (100, 200, 100), ((WINDOW_WIDTH//2) - 340), 220, self.display_surface, size = 15)
             self.draw_highscores(500, -350, 450, 20)                    

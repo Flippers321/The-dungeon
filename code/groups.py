@@ -9,14 +9,13 @@ class AllSprites(pygame.sprite.Group):
         
 class CameraGroup(AllSprites):
     def __init__(self):
-        # camera offset 
         super().__init__()
+        #camera offset 
         self.offset = vector()
         self.half_w = self.display_surf.get_size()[0] // 2
         self.half_h = self.display_surf.get_size()[1] // 2
-
-        # box setup
-        self.camera_borders = {'left': 400, 'right': 400, 'top': 250, 'bottom': 250}
+        #box setup
+        self.camera_borders = {'left': 400, 'right': 400, 'top': 250, 'bottom': 250} #size of the camera
         l = self.camera_borders['left']
         t = self.camera_borders['top']
         w = self.display_surf.get_size()[0]  - (self.camera_borders['left'] + self.camera_borders['right'])
@@ -26,22 +25,23 @@ class CameraGroup(AllSprites):
         #zoom
         self.zoom_scale = 1
 
-
     def box_camera(self,target):
-
+        #horizontal movement, checking if player has reached the left/right boarder
         if target.rect.left < self.camera_rect.left:
             self.camera_rect.left = target.rect.left
         if target.rect.right > self.camera_rect.right:
             self.camera_rect.right = target.rect.right
+        #vertical movement, checking if player has reached the top/bottom boarder
         if target.rect.top < self.camera_rect.top:
             self.camera_rect.top = target.rect.top
         if target.rect.bottom > self.camera_rect.bottom:
             self.camera_rect.bottom = target.rect.bottom
-
+        #setting offset
         self.offset.x = -self.camera_rect.left + self.camera_borders['left']
         self.offset.y = -self.camera_rect.top + self.camera_borders['top']
 
     def zoom_camera(self):
+        #handles zooming of camera based on input
         keys = pygame.key.get_pressed()
         if keys[pygame.K_MINUS]:
             if self.zoom_scale >= 1.1:
@@ -49,12 +49,9 @@ class CameraGroup(AllSprites):
         if keys[pygame.K_EQUALS]:
             if self.zoom_scale < 2.0:
                 self.zoom_scale += 0.1
-        
-        # changing where the box camera is positioned when zooming in
-
 
     def draw(self, player):
-        self.box_camera(player)
+        self.box_camera(player) #drawing box camera arounf player, following player
         
         zoom_screen = pygame.Surface(self.display_surf.get_size())
         zoom_screen.fill((38, 28, 26))

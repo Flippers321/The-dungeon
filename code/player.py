@@ -60,25 +60,23 @@ class Player(pygame.sprite.Sprite):
         self.death_sound = audio['death'] 
         self.hit_sound = audio['hit']
         
-        self.score = 0
+        self.score = 0 #Player score this run
 
     def get_volume(self, volume):    
+        #loading volume from config file
          with open("code\config.json", "r") as c:
              data = json.load(c)
-             #if data == '':
-             #    self(self.default_settings)
              value = data.get(volume)
-             #print('val', value)
              self.new_volume = (value / 100)
-             #print('new_val', self.new_volume)
 
              return(self.new_volume)
     def input(self):
-
+        #handles player input
         keys = pygame.key.get_pressed()
         self.input_vector = vector(0, 0)
         key_down = pygame.key.get_just_pressed()
 
+        #vertical
         if keys[pygame.K_s]:
             self.input_vector.y += 1
         if keys[pygame.K_w]:
@@ -102,7 +100,8 @@ class Player(pygame.sprite.Sprite):
         if key_down[pygame.K_SPACE] and self.bonus_jumps > 0 and not any((self.on_surface['left'], self.on_surface['right'], self.on_surface['floor'])):
             self.direction.y = -self.jump_height
             self.bonus_jumps -= 1
-            
+        
+        #dashing
         if key_down[pygame.K_LSHIFT] and self.dash_num > 0:
             self.timers['dash'].activate()
             self.dash_sound.play()
@@ -110,9 +109,7 @@ class Player(pygame.sprite.Sprite):
 
 
     def move(self, dt):
-        
-        #print(self.input_vector)
-        #horizontal
+        #handles player movement
         self.direction.x += self.input_vector.x * self.speed
 
         if self.timers['dash'].active:
@@ -134,7 +131,6 @@ class Player(pygame.sprite.Sprite):
         if self.jump:
             self.jump_sound.play()
             self.jump_sound.set_volume(self.get_volume('volume'))
-            #print(self.get_volume('volume'))
             if self.on_surface['floor']:
                 self.direction.y = -self.jump_height
             elif self.on_surface['left']:
@@ -158,27 +154,23 @@ class Player(pygame.sprite.Sprite):
         if self.platform:
             self.rect.x += self.platform.direction.x * self.platform.speed * dt
     def animate(self, dt):
-        
         self.frame_index += ANIMATION_SPEED * dt
         self.image = self.frames[self.state][int(self.frame_index % len(self.frames[self.state]))]
         self.image = self.image if self.facing_right else pygame.transform.flip(self.image, True, False)
 
     def check_contacts(self):
+        #checking contact with level surfaces
         floor_rect = pygame.Rect(self.rect.bottomleft,(self.rect.width, 1))
         roof_rect = pygame.Rect(self.rect.topleft, (self.rect.width, 1))
-        #strange collision thingy
         roof_rect.bottom = self.rect.top
         collide_rects = [sprite.rect for sprite in self.collision_sprites]
 
         right_rect = pygame.Rect(self.rect.topright + vector(0, self.rect.height / 4), (1, self.rect.height / 2))
         left_rect = pygame.Rect(self.rect.topleft + vector(0, self.rect.width / 4), (-1, self.rect.height / 2))
 
-        #pygame.draw.rect(self.display_surface, 'yellow', floor_rect)
-        #pygame.draw.rect(self.display_surface, 'yellow', roof_rect)
         self.platform = None
         for sprite in [sprite for sprite in self.collision_sprites.sprites() if hasattr(sprite, 'moving')]:
             if sprite.rect.colliderect(floor_rect):
-                print('player , on platform')
                 self.platform = sprite
 
         self.on_surface['floor'] = True if floor_rect.collidelist(collide_rects) >= 0 else False
@@ -211,7 +203,7 @@ class Player(pygame.sprite.Sprite):
                         self.rect.bottom = sprite.rect.top
                         self.direction.y = 0
 
-        for sprite in self.damage_sprites:
+        for sprite in self.damage_sprites: #handle getting hit by spike
             if sprite.rect.colliderect(self.rect) and not self.timers['damage'].active:
                 self.health -= 1
                 self.hit_sound.play()
@@ -227,22 +219,21 @@ class Player(pygame.sprite.Sprite):
                 self.hit_sound.play()
                 self.hit_sound.set_volume(self.get_volume('volume'))
                 self.timers['damage'].activate()
-                print('enemies hurt')
                 if self.health <= 0:
                     self.death()
      
             if sprite.rect.colliderect(self.rect):
                 if self.rect.bottom >= (sprite.rect.top - 1) and int(self.old_rect.bottom) <= int(sprite.old_rect.top):
-                    print('enemy felled')
                     self.kill_sound.play()
                     self.kill_sound.set_volume(self.get_volume('volume'))
                     return True               
                 
-    def check_ifdead(self):
+    def check_if_dead(self):
         if self.health <= 0:
             self.death
 
     def death(self):
+        #handle player death
         self.rect = self.image.get_frect(topleft = self.respawn)
         self.health = self.max_health
         self.death_sound.play()
@@ -266,7 +257,5 @@ class Player(pygame.sprite.Sprite):
             self.move(dt)
             self.move_platform(dt)
             self.animate(dt)
-            #self.dash_timer(dt)
             self.check_contacts()
             self.check_enemy_hit()
-        #print(self.timers['wall jump'].active)

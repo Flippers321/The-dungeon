@@ -7,7 +7,8 @@ class Slime(pygame.sprite.Sprite):
         self.z = Z_LAYERS['entity']
 
         self.frames, self.frame_index = frames, 0
-        self.image = self.frames['idle'][self.frame_index]
+        self.state, self.facing_right = 'idle', True
+        self.image = self.frames[self.state][self.frame_index]
         self.player = player_sprite
 
         self.jumps = 1
@@ -36,29 +37,29 @@ class Slime(pygame.sprite.Sprite):
     def detection(self):
         #player detection
         self.detect_vector = [0, 0]
-        #print(self.rect.x)
-        #print(self.player.rect.x)
         #horizontal pathing
         if self.player.rect.x > self.rect.x:
-            #print('pleyer is on the right')
-            self.detect_vector[0] += 1
+            self.detect_vector[0] += 1 #move left
+            self.facing_right = False
         if self.player.rect.x < self.rect.x:
-            #print('player is on the left')
-            self.detect_vector[0] += -1
+            self.detect_vector[0] += -1 #move right
+            self.facing_right = True
             
-            #+16 so the slime doesnt keep jumping even if player is on the same tile hieght
+            #+16 so the player mustr be one tile higher than slime for it to jump
         if (self.player.rect.y +16) < self.rect.y and self.on_surface['floor']: 
             self.jump = True
         else:
             self.jump = False
             
     def movement(self, dt):
-        
+        #handles movement on the enemy
+        #horizontal
         self.direction.x = self.detect_vector[0] *  self.speed
         self.direction.x *= 0.8
         self.rect.x += self.direction.x * dt
         self.collision('horizontal')
         
+        #jump action
         if self.jump:
             if self.on_surface['floor']:
                 self.direction.y = -self.jump_height
@@ -71,9 +72,9 @@ class Slime(pygame.sprite.Sprite):
         if self.on_surface['roof']:
             self.direction.y = 0
 
+        #vertical
         self.direction.y += self.gravity * dt
-        
-        ###is this needed (makes wall slides? maybe goo for falling down)
+
         if self.on_surface['left'] or self.on_surface['right']:
             if self.direction.y > 1:
                 self.direction.y = 1
@@ -82,18 +83,14 @@ class Slime(pygame.sprite.Sprite):
         self.collision('vert')            
          
     def check_contacts(self):
+        #cheking collisions with level surfaces
         floor_rect = pygame.Rect(self.rect.bottomleft,(self.rect.width, 1))
         roof_rect = pygame.Rect(self.rect.topleft, (self.rect.width, 1))
-        #strange collision thingy
         roof_rect.bottom = self.rect.top
         collide_rects = [sprite.rect for sprite in self.collision_sprites]
 
         right_rect = pygame.Rect(self.rect.topright + vector(0, self.rect.height / 4), (1, self.rect.height / 2))
         left_rect = pygame.Rect(self.rect.topleft + vector(0, self.rect.width / 4), (-1, self.rect.height / 2))
-
-        #pygame.draw.rect(self.display_surface, 'yellow', floor_rect)
-        #pygame.draw.rect(self.display_surface, 'yellow', roof_rect)
-
 
         self.on_surface['floor'] = True if floor_rect.collidelist(collide_rects) >= 0 else False
         self.on_surface['roof'] = True if roof_rect.collidelist(collide_rects) >= 0 else False
@@ -122,15 +119,22 @@ class Slime(pygame.sprite.Sprite):
                         self.rect.bottom = sprite.rect.top
                         self.direction.y = 0
 
-        for sprite in self.damage_sprites:
+        for sprite in self.damage_sprites: #handles being hit
             if sprite.rect.colliderect(self.rect):
                 self.health -= 1
                 if self.health <= 0:
                     self.death()
                     
     def death(self):
+        #checks if player has killed slime
         if self.player.check_enemy_hit():
             return True
+        
+    def animate(self, dt):
+        #handling sprite animation
+        self.frame_index += ANIMATION_SPEED * dt
+        self.image = self.frames[self.state][int(self.frame_index % len(self.frames[self.state]))]
+        self.image = self.image if self.facing_right else pygame.transform.flip(self.image, True, False)
 
     def update(self, dt):
         self.old_rect = self.rect.copy()
@@ -139,3 +143,4 @@ class Slime(pygame.sprite.Sprite):
         self.movement(dt)
         self.check_contacts()
         self.death()
+        self.animate(dt)
