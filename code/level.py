@@ -170,7 +170,7 @@ class Level():
 
         else:
             self.menu.draw_text(f'Your Score: {round(self.score)}', (255, 255, 255), (WINDOW_WIDTH / 2), 50, self.display_surface)
-            self.menu.draw_text('Congratulations!', (255, 255, 255), 950, 455, self.display_surface)
+            self.menu.draw_text('"Congratulations!"', (255, 255, 255), 950, 455, self.display_surface)
             if self.menu.game_paused == False and self.menu.submit == False:
                 self.menu.draw_text('press ESC to submit score!', (255, 255, 255), (WINDOW_WIDTH / 2), 70, self.display_surface)
             if self.menu.game_paused == True:
