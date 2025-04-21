@@ -91,31 +91,29 @@ class InputBox:
         self.container_rect = pygame.Rect(self.left_pos, self.top_pos, self.size[0], self.size[1])
     def get_click(self):
         pos = pygame.mouse.get_pos()
-        pressed = pygame.mouse.get_pressed()
+        pressed = pygame.mouse.get_just_pressed()
         #checking if mouse is clicked on the containder
         if self.container_rect.collidepoint(pos):
             if pressed[0] == 1:
                 self.active = True
-                #print(self.active)
-                #print('textbox xlixked')
                 return True
         return False
     
     def update(self):
+        self.get_click()
         if self.active == True:
             #print('input active')
-            if len(self.input) < 10:
+            if len(self.input) < 8:
                 for i in range(pygame.K_a, pygame.K_z):
                     if pygame.key.get_just_pressed()[i]:
                         self.input += chr(i).upper()
                 for i in range (pygame.K_0, pygame.K_9):
                     if pygame.key.get_just_pressed()[i]:
                         self.input += chr(i)
-                if pygame.key.get_just_pressed()[pygame.K_BACKSPACE]:
-                    self.input = self.input[:-1]
-                if self.keys[pygame.K_RETURN]:
-                    self.active = False ####
-            #print(self.input)
+            if pygame.key.get_just_pressed()[pygame.K_BACKSPACE]:
+                self.input = self.input[:-1]                        
+            if self.keys[pygame.K_RETURN]:
+                self.active = False
         return self.input
                     
     def draw(self, screen):
@@ -139,7 +137,6 @@ class Menu:
         self.paused_state = "main"
         self.default_settings = {'volume': 0.5}
         self.new_setting = {'new_volume': 0}
-        self.name = ''
         #load images
         self.button_images = {'resume': pygame.image.load(r'assets\Buttons\resume.png').convert_alpha(),
                               'options': pygame.image.load(r'assets\Buttons\options.png').convert_alpha(),
@@ -255,8 +252,7 @@ class Menu:
                     sys.exit()  
         
     def win_actions(self):
-        # if self.win_input[0]:
-        #     self.win_input[0].update()
+        self.win_input[0].update()
         if self.game_paused == True:
             if self.paused_state == 'win':
                 if self.buttons_win[0].get_click():
@@ -265,8 +261,6 @@ class Menu:
                 if self.buttons_win[1].get_click():
                     self.submit = True
                     self.game_paused = False ####
-                if self.win_input[0].get_click():
-                    self.name = (self.win_input[0].update())
                     
                 
     def draw_text(self, text, colour, x, y, surface, size = 16):

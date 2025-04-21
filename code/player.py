@@ -5,7 +5,7 @@ import json
 from UI import Menu
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos,  groups, collision_sprites, damage_sprites, enemy_sprites, health, frames, audio):
+    def __init__(self, pos,  groups, collision_sprites, damage_sprites, enemy_sprites, health, frames, audio, level_count):
         super().__init__(groups)
         self.z = Z_LAYERS['entity']
 
@@ -14,7 +14,7 @@ class Player(pygame.sprite.Sprite):
         self.image = self.frames[self.state][self.frame_index]
         
         self.menu = Menu() # can not get menu to pause player movement and know when player is win
-        
+        self.level_count = level_count
         
         #image
         self.respawn = pos
@@ -254,18 +254,19 @@ class Player(pygame.sprite.Sprite):
             timer.update()
 
     def update(self, dt):
-        self.old_rect = self.rect.copy()
-        self.update_timers()
-        self.get_volume('volume')
-        self.input()
-        #update drag
-        if self.on_surface['floor']:
-            self.bonus_jumps = 1
-            self.dash_num = 1
-        self.move(dt)
-        self.move_platform(dt)
-        self.animate(dt)
-        #self.dash_timer(dt)
-        self.check_contacts()
-        self.check_enemy_hit()
+        if self.level_count !=2:
+            self.old_rect = self.rect.copy()
+            self.update_timers()
+            self.get_volume('volume')
+            self.input()
+            #update drag
+            if self.on_surface['floor']:
+                self.bonus_jumps = 1
+                self.dash_num = 1
+            self.move(dt)
+            self.move_platform(dt)
+            self.animate(dt)
+            #self.dash_timer(dt)
+            self.check_contacts()
+            self.check_enemy_hit()
         #print(self.timers['wall jump'].active)

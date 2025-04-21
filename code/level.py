@@ -7,7 +7,7 @@ from UI import Menu
 import requests, json
 
 class Level():
-    def __init__(self, tmx_map, obj_frames, score):
+    def __init__(self, tmx_map, obj_frames, score, level_num):
         self.display_surface = pygame.display.get_surface()
         pygame.mixer.init()
         
@@ -17,7 +17,7 @@ class Level():
         self.damage_sprites = pygame.sprite.Group()
         self.enemy_sprites = pygame.sprite.Group()
         
-        
+        self.level_count = level_num
         self.score = score
         self.menu = Menu()
         #audio
@@ -27,7 +27,6 @@ class Level():
                       'death': pygame.mixer.Sound('assets\MP3\death.mp3'),
                       'dash': pygame.mixer.Sound('assets\MP3\dash.mp3'),
                       'hit': pygame.mixer.Sound('assets\MP3\hit.mp3')}
-        #self.audio_volume = round(self.menu.volume)
         self.platform_speed = 100
         self.setup(tmx_map, obj_frames)    
     #getting pos of values stored in layer
@@ -59,7 +58,8 @@ class Level():
                     enemy_sprites = self.enemy_sprites,
                     health = 10,
                     frames = obj_frames['player'],
-                    audio = self.audio)    
+                    audio = self.audio,
+                    level_count = self.level_count)    
                              
             if obj.name == 'enemy':
                 self.enemy = Slime(
@@ -79,16 +79,26 @@ class Level():
                 start_pos = (obj.x - 32, obj.y + obj.height/2)
                 end_pos = (obj.x + obj.width, obj.y + obj.height/2)
                 MovingSprite((self.all_sprites, self.collision_sprites), start_pos, end_pos, move_direction, self.platform_speed)  
-    def enemy_removal(self):
+    def enemy_removal(self, level_count):
         if self.enemy.death() == True:
-            self.enemy.rect.x = 260
-            self.enemy.rect.y = 420
-            self.score -= 50
+            if level_count == 0:
+                #amount of tiles (using the tmx file) for position of enemy cage
+                self.enemy.rect.x = 16 * TILE_SIZE
+                self.enemy.rect.y = 26 * TILE_SIZE
+            if level_count == 1:
+                self.enemy.rect.x = 33 * TILE_SIZE 
+                self.enemy.rect.y = 66 * TILE_SIZE 
+            self.score -= 500
 
     def update_score(self, level_count):
         if level_count != 2:
-            self.score += 1        
+            self.score += 1
+            #making sure score doesnt go negative (as killing an enemy decreases score)
+            #This also makes it so the lowesr score (the best one) can only be 0
+            if self.score < 0:
+                self.score = 0        
             return(self.score)
+
 
         # if self.menu.restart():
         #     self.score = 0
@@ -106,11 +116,11 @@ class Level():
             self.menu.restart = False
             return True
             
-    def post_score(self, name, score):    
-        if self.menu.submit == True and self.menu.name != '':
+    def post_score(self, score):    
+        if self.menu.submit == True and self.menu.win_input[0].input != '':
             try:
                 print('this pont')
-                request = requests.post("http://127.0.0.1:5000/leaderboard", json = json.dumps({ "data": [name, score]}))
+                request = requests.post("http://127.0.0.1:5000/leaderboard", json = json.dumps({ "data": [self.menu.win_input[0].input, score]}))
                 self.menu.submit = False
             except:
                 print("ERROR SENDING TO SERVER")
@@ -119,7 +129,7 @@ class Level():
         try:
             highscores = requests.get("http://127.0.0.1:5000/SERVER") #TODO
         except:
-            self.menu.draw_text(f'FAILED TO LOAD CONNECT TO SERVER', (100, 100, 100), ((WINDOW_WIDTH//2) - centre_offset_user),(250 + 24*i), self.display_surface, size = 32)
+            self.menu.draw_text(f'FAILED TO LOAD CONNECT TO SERVER', (100, 100, 100), ((WINDOW_WIDTH//2) - centre_offset_user),(250 + 24), self.display_surface, size = 32)
         
         for i,score in enumerate(highscores.json()):
             self.menu.draw_text(f'{i + 1}.', (100, 100, 100), ((WINDOW_WIDTH//2) - num_offset),(250 + 24*i), self.display_surface, size = text_size)
@@ -159,12 +169,8 @@ class Level():
                 self.menu.draw_text(f'Lives: {round(self.player.health)}', (100, 100, 100), 200, WINDOW_HEIGHT - 40, self.display_surface)
 
         else:
-            # if self.menu.reload_scores == True:
-            #     self.previous_scores = False
-            #     self.draw_highscores(500, -350, 450)
-            
             self.menu.draw_text(f'Your Score: {round(self.score)}', (255, 255, 255), (WINDOW_WIDTH / 2), 50, self.display_surface)
-            self.menu.draw_text('Congratulations!', (255, 255, 255), 100, 50, self.display_surface)
+            self.menu.draw_text('Congratulations!', (255, 255, 255), 950, 455, self.display_surface)
             if self.menu.game_paused == False and self.menu.submit == False:
                 self.menu.draw_text('press ESC to submit score!', (255, 255, 255), (WINDOW_WIDTH / 2), 70, self.display_surface)
             if self.menu.game_paused == True:
@@ -182,14 +188,13 @@ class Level():
     def run(self, dt, level_count):
         self.display_surface.fill(BACKGROUND_COLOUR)
         self.all_sprites.update(dt)
-        self.enemy_removal()
+        self.enemy_removal(level_count)
         self.check_win()
         self.check_restart()
         self.update_score(level_count)
-        self.post_score(self.menu.name, self.score)
+        self.post_score(self.score)
         self.all_sprites.draw(self.player)
         self.draw_menu(level_count)
         self.menu.menu_state(level_count)
         self.menu.paused_actions()
         self.menu.win_actions()
-        #self.menu.restart()
