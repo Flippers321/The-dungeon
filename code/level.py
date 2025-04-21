@@ -58,7 +58,7 @@ class Level():
                     collision_sprites = self.collision_sprites,
                     damage_sprites = self.damage_sprites,
                     enemy_sprites = self.enemy_sprites,
-                    health = 10,
+                    health = 5,
                     frames = obj_frames['player'],
                     audio = self.audio,
                     level_count = self.level_count
@@ -66,6 +66,7 @@ class Level():
                              
             if obj.name == 'enemy':
                 #initialising the enemy at the specified location
+                #for i in range(1000):
                 self.enemy = Slime(
                     pos = (obj.x, obj.y),
                     groups = [self.all_sprites, self.enemy_sprites],
@@ -118,25 +119,29 @@ class Level():
             self.menu.restart = False
             return True
             
-    def post_score(self, score):    
-        if self.menu.submit == True and self.menu.win_input[0].input != '':
-            try:
-                print('this pont')
-                request = requests.post("http://127.0.0.1:5000/leaderboard", json = json.dumps({ "data": [self.menu.win_input[0].input, score]}))
-                self.menu.submit = False
-            except:
-                print("ERROR SENDING TO SERVER")
+    def post_score(self, score):
+        if score > -1:   
+            if self.menu.submit == True and self.menu.win_input[0].input != '':
+                try:
+                    print('this pont')
+                    request = requests.post("http://127.0.0.1:5000/leaderboard", json = json.dumps({ "data": [self.menu.win_input[0].input, score]}))
+                    self.menu.submit = False
+                except:
+                    print("ERROR SENDING TO SERVER")
+                
+
         
     def draw_highscores(self, num_offset, centre_offset_score, centre_offset_user, text_size = 28):
         try:
             highscores = requests.get("http://127.0.0.1:5000/SERVER") #TODO
-        except:
+            for i,score in enumerate(highscores.json()):
+                self.menu.draw_text(f'{i + 1}.', (100, 100, 100), ((WINDOW_WIDTH//2) - num_offset),(250 + 24*i), self.display_surface, size = text_size)
+                self.menu.draw_text(f'{score[0]}', (100, 100, 100), ((WINDOW_WIDTH//2) - centre_offset_user),(250 + 24*i), self.display_surface, size = text_size) #(instead of print do draw_text? just callk it on line 150)
+                self.menu.draw_text(f'{score[1]}', (100, 100, 100), ((WINDOW_WIDTH//2) + centre_offset_score),(250 + 24*i), self.display_surface, size = text_size)            
+        except (requests.ConnectionError):
             self.menu.draw_text(f'FAILED TO LOAD CONNECT TO SERVER', (100, 100, 100), ((WINDOW_WIDTH//2) - centre_offset_user),(250 + 24), self.display_surface, size = 32)
         
-        for i,score in enumerate(highscores.json()):
-            self.menu.draw_text(f'{i + 1}.', (100, 100, 100), ((WINDOW_WIDTH//2) - num_offset),(250 + 24*i), self.display_surface, size = text_size)
-            self.menu.draw_text(f'{score[0]}', (100, 100, 100), ((WINDOW_WIDTH//2) - centre_offset_user),(250 + 24*i), self.display_surface, size = text_size) #(instead of print do draw_text? just callk it on line 150)
-            self.menu.draw_text(f'{score[1]}', (100, 100, 100), ((WINDOW_WIDTH//2) + centre_offset_score),(250 + 24*i), self.display_surface, size = text_size)
+
         
     #displaying the menus
     def draw_menu(self, level_count):
@@ -172,13 +177,14 @@ class Level():
 
         else:
             self.menu.draw_text(f'Your Score: {round(self.score)}', (255, 255, 255), (WINDOW_WIDTH / 2), 50, self.display_surface)
-            self.menu.draw_text('"Congratulations!"', (255, 255, 255), 950, 455, self.display_surface)
+            self.menu.draw_text('"Congratulations!"', (255, 255, 255), 955, 455, self.display_surface)
             if self.menu.game_paused == False and self.menu.submit == False:
                 self.menu.draw_text('press ESC to submit score!', (255, 255, 255), (WINDOW_WIDTH / 2), 70, self.display_surface)
             if self.menu.game_paused == True:
                 self.menu.draw_text('username:', (255, 255, 255), (WINDOW_WIDTH / 2), 320, self.display_surface)
                 self.menu.draw(self.display_surface, level_count)
-
+            if self.score < 0:
+                self.menu.draw_text(f'UNACCEPTED SCORE', (100, 100, 100), (WINDOW_WIDTH//2 - 80),(250 + 24), self.display_surface, size = 32)
             self.menu.draw_text('Highscores', (150, 150, 150), ((WINDOW_WIDTH//2) - 400), 180, self.display_surface, size = 15)
             self.menu.draw_text('user', (100, 200, 100), ((WINDOW_WIDTH//2) - 440), 220, self.display_surface, size = 15)
             self.menu.draw_text('score', (100, 200, 100), ((WINDOW_WIDTH//2) - 340), 220, self.display_surface, size = 15)

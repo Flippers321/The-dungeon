@@ -33,7 +33,7 @@ class Player(pygame.sprite.Sprite):
         self.bonus_jumps = 1
         self.dash = False
         self.dashx_multi = 3
-        self.dashy_multi = 1.6
+        self.dashy_multi = 1.5
         self.dash_num = 1
         self.health = self.max_health = health
         self.input_vector = vector()

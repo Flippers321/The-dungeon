@@ -115,11 +115,11 @@ class InputBox:
                 for i in range (pygame.K_0, pygame.K_9):
                     if pygame.key.get_just_pressed()[i]:
                         self.input += chr(i)
+                if pygame.key.get_just_pressed()[pygame.K_SPACE]:
+                    self.input += ' '
             #allowing player to backspace and deactivate input even if max length is reached
             if pygame.key.get_just_pressed()[pygame.K_BACKSPACE]:
                 self.input = self.input[:-1]                        
-            if self.keys[pygame.K_RETURN]:
-                self.active = False
         return self.input
                     
     def draw(self, screen):
