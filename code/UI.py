@@ -194,8 +194,6 @@ class Menu:
         #saving settings to confi file
         with open("code\config.json", "w") as c:
             value = c.write(json.dumps({'volume': round(self.sliders[0].get_value())}))
-            print("SAVING", value)
-            print('save', json.dumps({'volume': self.sliders[0].get_value()}))
     
     def menu_state(self, level_count): 
         #handles menu state transitions based on input
@@ -238,7 +236,6 @@ class Menu:
             if self.paused_state == "options":
                 if self.buttons_options[0].get_click():
                     self.paused_state = "main"
-                    self.game_paused = False
                 if self.buttons_options[1].get_click():
                     pygame.quit()
                     sys.exit()   

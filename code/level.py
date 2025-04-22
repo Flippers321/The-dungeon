@@ -99,7 +99,7 @@ class Level():
 
     def update_score(self, level_count):
         if level_count != 2:
-            self.score += 1
+            self.score += 1 
             #ensure score doesnt go negative (as killing an enemy decreases score)
             #this also makes it so the lowesr score (the best one) can only be 0
             if self.score < 0:
@@ -153,7 +153,7 @@ class Level():
                 if self.menu.paused_state == 'options':
                 #print(self.menu.volume)
                     self.menu.draw_text(f'Volume: {round(self.menu.volume)}', (100, 100, 100), (WINDOW_WIDTH / 2) - 16, 450, self.display_surface)
-                
+                    self.menu.draw_text('Press ESC to go back!', (100, 100, 100), 100, 20, self.display_surface)
                 
                 if self.menu.paused_state == 'win':
                     print('/////////////\n///////////\nshould be printing')
@@ -167,7 +167,7 @@ class Level():
                     self.menu.draw_text('user', (100, 200, 100), ((WINDOW_WIDTH//2) - 150), 200, self.display_surface, size = 30)
                     self.menu.draw_text('score', (100, 200, 100), ((WINDOW_WIDTH//2) + 150), 200, self.display_surface, size = 30)
                     self.draw_highscores(200, 150, 150) #setting the users, scores, and positions of the leaderboards offsets from the centre of the screen (same as the 'user','score' text offsets)
-
+                    self.menu.draw_text('Press ESC to go back!', (100, 100, 100), 100, 20, self.display_surface)
 
             else:
                 self.menu.draw_text('Press ESC to Pause', (100, 100, 100), 100, 20, self.display_surface)

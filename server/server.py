@@ -29,7 +29,7 @@ def merge_sort(array, key):
         k = 0 # merged index
         while i < len(left_array) and j < len(right_array):
             #adding the smaller elements into the merged array
-            if key(left_array[i]) < key(right_array[j]):
+            if key(left_array[i]) > key(right_array[j]):
                 array[k] = left_array[i] 
                 i += 1
             else:
@@ -48,8 +48,9 @@ def merge_sort(array, key):
             j += 1
             k += 1
             
-    return array #scores should be lowest first so don't reverse the order again
-    
+    return array[::-1] 
+    #scores should be lowest first so reverse the order //
+    #This makes it so if someone gets the same score as someone else, the first user to achieve it will be infront on the leaderboard 
 
 @app.route("/leaderboard", methods=["POST"])
 def send():
